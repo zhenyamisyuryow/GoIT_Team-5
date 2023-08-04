@@ -25,6 +25,8 @@ class Birthday(Field):
 class Address(Field):
     pass
 
+class Record:
+    pass
 
 class Note(UserDict):
     pass
