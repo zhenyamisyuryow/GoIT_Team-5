@@ -39,7 +39,36 @@ class Email(Field):
 
 
 class Birthday(Field):
-    pass
+    def __init__(self, value : str = None):
+        self.__value = None
+        self.value = value
+
+    @property
+    def value(self):
+        if self.__value < datetime.now().date():
+            return self.__value
+
+
+    @value.setter
+    def value(self, value):
+        try:
+            birth_date = re.findall('\d+', value)
+            if birth_date[2] and len(birth_date[2])==4:
+                birth_date[2] = birth_date[2][2:]
+            birth ="/".join(birth_date)
+            self.__value = datetime.strptime(birth, '%d/%m/%y').date()
+        except ValueError:
+
+            print(f"Введите корректную дату в формате \033[34mmm-dd-yyyy\033[0m")
+    
+    def __str__(self) -> str:
+        try:
+            return f"дата рождения: \033[34m{self.value.strftime('%d-%m-%y')}\033[0m"
+
+        except AttributeError:
+            return ""
+
+    
 
 
 class Address(Field):
