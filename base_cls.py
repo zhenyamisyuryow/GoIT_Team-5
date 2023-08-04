@@ -3,8 +3,6 @@ import re
 from datetime import datetime
 import pickle
 
-class InputError(Exception):
-    pass
 class Field:
     pass
 
@@ -32,8 +30,8 @@ class Phone(Field):
             self.__value = form_phone
 
         except AttributeError:
-            raise InputError(
-                f"Вводите корректно номера телефонов, например, в формате: \033[34m0XX-XXX-XX-XX\033[0m")
+            print(f"Вводите корректно номера телефонов, например, в формате: \033[34m0XX-XXX-XX-XX\033[0m")
+
 
 
 class Email(Field):
