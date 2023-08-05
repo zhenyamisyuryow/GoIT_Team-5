@@ -38,12 +38,10 @@ class Phone(Field):
     def value(self, phone):
         result = re.findall(r"\+380{1}[(]{1}\d{2}[)]{1}[-]{1}\d{3}[-]{1}\d{2}[-]{1}\d{2}", phone)
         if not result:
-            raise ValueError(f"Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX")
+            raise ValueError(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX{TerminalColors.ENDC}")
         
         self.__value= "+"+re.sub(r"(\D)","",result[0])
         
-        
-
 
 
 
@@ -102,7 +100,7 @@ class Address(Field):
 
 class Record:
     def __init__(self, name, phone=None, birthday=None, email=None, address=None):
-        self.name = name
+        self.name = Name(name)
         self.phones = []
         if phone:
             self.add_phone(phone)
@@ -149,7 +147,7 @@ class Record:
             self.address = Address(address)
 
     def __repr__(self):             #Вывести все поля для класса Record в строку
-        return f"Record(name='{self.name}', phones={self.phones}, birthday={self.birthday}, email={self.email}, address={self.address})"
+        return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
 
 class Note(UserDict):
     pass
@@ -182,3 +180,15 @@ class Contacts(UserDict):
                         contacts.append(record)
                         break
         return contacts
+    
+    
+class TerminalColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
