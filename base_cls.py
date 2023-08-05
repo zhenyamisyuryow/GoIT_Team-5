@@ -155,3 +155,15 @@ class Contacts(UserDict):
         records = list(self.data.values())
         for i in range(0, len(records), num_records):
             yield records[i:i + num_records]
+
+    def search_contacts(self, query):
+        contacts = []
+        for record in self.data.values():
+            if query.lower() in str(record.name).lower():
+                contacts.append(record)
+            else:
+                for phone in record.phones:
+                    if query in phone.value:
+                        contacts.append(record)
+                        break
+        return contacts
