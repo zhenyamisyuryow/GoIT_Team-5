@@ -135,6 +135,7 @@ class Record:
 
     def __repr__(self):
         return f"Name: {self.name.value},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
+    
 class Note(UserDict):
     pass
 
