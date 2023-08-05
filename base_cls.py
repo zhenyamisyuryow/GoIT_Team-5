@@ -88,13 +88,12 @@ class Record:
         self.phones.append(Phone(phone))
 
     def edit_phone(self, old_phone, new_phone):         #Изменить номер телефона
-        for phone in self.phones:
-            if phone.value == old_phone:
-                phone.value = new_phone
-                break
+        if old_phone in self.phones:
+            index = self.phones.index(old_phone)
+            self.phones[index] = new_phone
 
-    def delete_phone(self, phone):          #Удалить номера 
-        self.phones = [p for p in self.phones if p.value != phone]
+    def delete_phone(self, phone):          #Удалить номер телефона
+        self.phones.remove(phone)
 
     def add_birthday(self, birthday):           #Добавить даты рождения
         self.birthday = Birthday(birthday)
@@ -144,11 +143,3 @@ class Contacts(UserDict):
         records = list(self.data.values())
         for i in range(0, len(records), num_records):
             yield records[i:i + num_records]
-     
-    def __next__(self):     #Соритровка списка контактов по имени 
-        if self.index < len(self.sorted_data):
-            record = self.sorted_data[self.index][1]
-            self.index += 1
-            return record
-        else:
-            raise StopIteration
