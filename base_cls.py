@@ -1,6 +1,6 @@
 from collections import UserDict
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import pickle
 
 class Field:
@@ -92,7 +92,20 @@ class Birthday(Field):
         except AttributeError:
             return ""
 
-    
+    def __calc_birthday__(self):
+        cd = datetime.now().date()
+        nd = self.value
+        if nd.month == 2 and nd.day == 29:
+            new_bd = datetime(year = cd.year, month = 2, day = nd.day - int(bool(cd.year%4))).date()
+            
+            if new_bd < cd: 
+                new_bd = datetime(year = cd.year + 1, month = 2, day = nd.day - int(bool((cd.year+1)%4))).date()
+            
+        else:
+            new_bd = new_bd = datetime(year = cd.year, month = nd.month, day = nd.day).date()
+            if new_bd < cd:
+                new_bd = new_bd.replace(year = cd.year + 1)
+        return (new_bd - cd).days
 
 
 class Address(Field):
@@ -181,7 +194,18 @@ class Contacts(UserDict):
                         break
         return contacts
     
-    
+    def congratulate_period(self, number_days):
+        start_period = datetime.now().date()
+        end_period = start_period + timedelta(number_days)
+        list_congratulate = []
+        for record in self.data.values():
+            if record.birthday:
+                if record._Birthday__calc_birthday() <= number_days:
+                    list_congratulate.append(record)
+        if list_congratulate:
+            return f"За период с {start_period} по {end_period} в вашей книге будут следующие именинники: {', '.join(str(p) for p in list_congratulate)}"
+        else:
+            return f"За период с {start_period} по {end_period} в вашей книге нет именинников"
 class TerminalColors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -192,3 +216,5 @@ class TerminalColors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    
+
