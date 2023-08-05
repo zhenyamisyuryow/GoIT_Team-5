@@ -21,16 +21,14 @@ class Phone(Field):
 
     @value.setter
     def value(self, phone):
-        try:
-            pattern = r"\+?3?8?[- (]?0\d{2}[- )]?\d{3}[- ]?\d{2}[- ]?\d{2}$"
-            add_cod = "+380"
-            result = (re.search(pattern, phone)).group()
-            res_phone = re.sub(r"(\D)", "", result)
-            form_phone = add_cod[0:13-len(res_phone)] + res_phone
-            self.__value = form_phone
+        result = re.findall(r"\+380{1}[(]{1}\d{2}[)]{1}[-]{1}\d{3}[-]{1}\d{2}[-]{1}\d{2}", phone)
+        if not result:
+            raise ValueError(f"Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX")
+        
+        self.__value= "+"+re.sub(r"(\D)","",result[0])
+        
+        
 
-        except AttributeError:
-            print(f"Вводите корректно номера телефонов, например, в формате: \033[34m0XX-XXX-XX-XX\033[0m")
 
 
 
@@ -45,25 +43,25 @@ class Birthday(Field):
 
     @property
     def value(self):
-        if self.__value < datetime.now().date():
-            return self.__value
+        return self.__value
 
 
     @value.setter
     def value(self, value):
         try:
-            birth_date = re.findall('\d+', value)
-            if birth_date[2] and len(birth_date[2])==4:
-                birth_date[2] = birth_date[2][2:]
-            birth ="/".join(birth_date)
-            self.__value = datetime.strptime(birth, '%d/%m/%y').date()
+            result = re.findall(r"\d\d-\d\d-\d{4}", value)
+            res_data = datetime.strptime(result[0], '%d-%m-%Y')
+            if res_data <= datetime.now():
+                self.__value = res_data.date()
+            else:
+                print(f"Date of birth cannot be in the future! Please try again")
         except ValueError:
 
-            print(f"Введите корректную дату в формате \033[34mmm-dd-yyyy\033[0m")
+            print(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
     
     def __str__(self) -> str:
         try:
-            return f"дата рождения: \033[34m{self.value.strftime('%d-%m-%y')}\033[0m"
+            return f"date of birth: \033[34m{self.value.strftime('%d-%m-%y')}\033[0m"
 
         except AttributeError:
             return ""
@@ -83,3 +81,4 @@ class Note(UserDict):
 
 class Contacts(UserDict):
     pass
+
