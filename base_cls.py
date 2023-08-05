@@ -203,9 +203,9 @@ class Contacts(UserDict):
                 if record._Birthday__calc_birthday() <= number_days:
                     list_congratulate.append(record)
         if list_congratulate:
-            return f"За период с {start_period} по {end_period} в вашей книге будут следующие именинники: {', '.join(str(p) for p in list_congratulate)}"
+            return f"For the period from {start_period} to {end_period}, the following contacts have birthdays in : {', '.join(str(p) for p in list_congratulate)}"
         else:
-            return f"За период с {start_period} по {end_period} в вашей книге нет именинников"
+            return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
 class TerminalColors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
