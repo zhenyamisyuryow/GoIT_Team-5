@@ -93,19 +93,19 @@ class Birthday(Field):
             return ""
 
     def __calc_birthday__(self):
-        cd = datetime.now().date()
-        nd = self.value
-        if nd.month == 2 and nd.day == 29:
-            new_bd = datetime(year = cd.year, month = 2, day = nd.day - int(bool(cd.year%4))).date()
+        today = datetime.now().date()
+        birth_date = self.value
+        if birth_date.month == 2 and birth_date.day == 29:
+            future_birthday = datetime(year = today.year, month = 2, day = birth_date.day - int(bool(today.year%4))).date()
             
-            if new_bd < cd: 
-                new_bd = datetime(year = cd.year + 1, month = 2, day = nd.day - int(bool((cd.year+1)%4))).date()
+            if future_birthday < today: 
+                future_birthday = datetime(year = today.year + 1, month = 2, day = birth_date.day - int(bool((today.year+1)%4))).date()
             
         else:
-            new_bd = new_bd = datetime(year = cd.year, month = nd.month, day = nd.day).date()
-            if new_bd < cd:
-                new_bd = new_bd.replace(year = cd.year + 1)
-        return (new_bd - cd).days
+            future_birthday = datetime(year = today.year, month = birth_date.month, day = birth_date.day).date()
+            if future_birthday < today:
+                future_birthday = future_birthday.replace(year = today.year + 1)
+        return (future_birthday - today).days
 
 
 class Address(Field):
