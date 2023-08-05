@@ -82,4 +82,16 @@ class Note(UserDict):
 
 
 class Contacts(UserDict):
-    pass
+    def add_record(self, record: Record):
+        self.data[record.name.value] = record
+
+    def get_record(self, name):
+        return self.data.get(name)
+
+    def delete_record(self, name):
+        return self.data.pop(name, None)
+
+    def iterator(self, num_records):
+        records = list(self.data.values())
+        for i in range(0, len(records), num_records):
+            yield records[i:i + num_records]
