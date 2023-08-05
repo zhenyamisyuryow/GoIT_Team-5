@@ -56,7 +56,7 @@ class Email(Field):
     
     @value.setter
     def value(self, email):
-        if re.match(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+        if re.match(r'^[a-z0-9]+[._\-+]*[a-z0-9]*@\w+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$', email):
             self.__value = email
         else:
             raise ValueError("Email should match the format johndoe@domain.com")
