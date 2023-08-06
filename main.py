@@ -89,6 +89,9 @@ items_list = {
 def main():
     print("Welcome to Virtual Assistant!")
 
+    contacts.load_book()
+    
+
     while True:
         print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall.{TerminalColors.ENDC}")
         user_input = input("Enter the command: ").lower()
@@ -106,6 +109,7 @@ def main():
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
             print(command_maps["bye"]())
+            contacts.save_book()
             break
         else:
             items = input(f"What would you like to {command}?: ").split(', ')

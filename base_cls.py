@@ -210,6 +210,8 @@ class Notes(Note):
 
 
 class Contacts(UserDict):
+    
+    filename = "data.bin"
    
     def add_record(self, record: Record):       #Добавление записи
         self.data[record.name.value] = record
@@ -249,6 +251,20 @@ class Contacts(UserDict):
             return f"For the period from {start_period} to {end_period}, the following contacts have birthdays : {', '.join(str(p) for p in list_congratulate)}"
         else:
             return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
+        
+    def load_book(self):
+
+        try:
+            with open(self.filename, "rb") as fh:
+                self.data = pickle.load(fh)
+        except FileNotFoundError:
+            pass
+    
+    def save_book(self):
+        with open(self.filename, "wb") as fh:
+            pickle.dump(self.data, fh)   
+    
+        
 class TerminalColors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
