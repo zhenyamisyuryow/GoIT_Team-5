@@ -163,7 +163,51 @@ class Record:
         return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
 
 class Note(UserDict):
-    pass
+    def __init__(self, title: str = None, content: str = None, tags: list = None) -> None:
+        self.title = title
+        self.content = content
+        self.tags = tags or []
+
+    def add_title(self, title: str):
+        self.title = title
+
+    def add_content(self, content: str):
+        self.content = content
+
+    def add_tags(self, tags: list):
+        self.tags = tags
+
+    
+    def edit_title(self, title: str):
+        self.title = title
+
+    
+    def edit_content(self, content: str):
+        self.content = content
+
+    
+    def edit_tags(self, tags: list):
+        self.tags = tags
+
+    
+    def __repr__(self) -> str:
+        return f"Note(title='{self.title}', content='{self.content}', tags={self.tags})"
+
+class Notes(Note):
+    def __init__(self):
+        self.data = {}
+
+    
+    def add_note(self, name: str, title: str = None, content: str = None, tags: list = None):
+        note = Note(title, content, tags)
+        self.data[name] = note
+
+    
+    def get_note(self, name: str):
+        return self.data.get(name)
+
+    def delete_note(self, name: str):
+        return self.data.pop(name, None)
 
 
 class Contacts(UserDict):
