@@ -175,7 +175,7 @@ class Note(UserDict):
         self.content = content
 
     def add_tags(self, tags: list):
-        self.tags = tags
+        self.tags.extend(tags)
 
     
     def edit_title(self, title: str):
