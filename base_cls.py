@@ -173,8 +173,9 @@ class Note(UserDict):
     def add_content(self, content: str):
         self.content = content
 
-    def add_tags(self, tags: list):
-        self.tags.extend(tags)
+    def add_tags(self, tags_str: str):
+        tags_list = tags_str.split(",") # Convert the input string to a list of tags
+        self.tags.extend(tags_list)
 
     
     def edit_title(self, title: str):
