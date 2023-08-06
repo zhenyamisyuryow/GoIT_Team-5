@@ -244,10 +244,10 @@ class Contacts(UserDict):
         list_congratulate = []
         for record in self.data.values():
             if record.birthday:
-                if record._Birthday__calc_birthday() <= number_days:
+                if record.birthday.__calc_birthday__() <= number_days:
                     list_congratulate.append(record)
         if list_congratulate:
-            return f"For the period from {start_period} to {end_period}, the following contacts have birthdays in : {', '.join(str(p) for p in list_congratulate)}"
+            return f"For the period from {start_period} to {end_period}, the following contacts have birthdays : {', '.join(str(p) for p in list_congratulate)}"
         else:
             return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
 class TerminalColors:
