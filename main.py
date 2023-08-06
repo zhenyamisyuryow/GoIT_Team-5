@@ -70,12 +70,20 @@ def add(items, name):
                 return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}{e}{TerminalColors.ENDC}"
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been added.{TerminalColors.ENDC}"
 
+def congratulate():
+    while True:
+        try:
+            return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
+        except:
+            pass
+    
 
 command_maps = {
     "hello" : hello,
     "bye" : bye,
-    "add": add,
-    "showall": showall,
+    "add" : add,
+    "showall" : showall,
+    "congratulate" : congratulate
 }
 items_list = {
     "contact": True,
@@ -93,7 +101,7 @@ def main():
     
 
     while True:
-        print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall.{TerminalColors.ENDC}")
+        print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, bye.{TerminalColors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
             print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide a command.{TerminalColors.ENDC}")
@@ -104,7 +112,7 @@ def main():
             print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide valid command.{TerminalColors.ENDC}")
             continue
 
-        if command in ["hello", "showall"]:
+        if command in ["hello", "showall", "congratulate"]:
             print(command_maps[command]())
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
