@@ -234,13 +234,13 @@ class Contacts(UserDict):
         contacts = []
         for record in self.data.values():
             if query.lower() in str(record.name).lower():
-                contacts.append(record)
+                contacts.append(str(record))
             else:
                 for phone in record.phones:
                     if query in phone.value:
-                        contacts.append(record)
+                        contacts.append(str(record))
                         break
-        return contacts
+        return '\n\n'.join(contacts)
     
     def congratulate_period(self, number_days):
         start_period = datetime.now().date()
@@ -251,7 +251,8 @@ class Contacts(UserDict):
                 if record.birthday.__calc_birthday__() <= number_days:
                     list_congratulate.append(record)
         if list_congratulate:
-            return f"For the period from {start_period} to {end_period}, the following contacts have birthdays : {', '.join(str(p) for p in list_congratulate)}"
+            nl = '\n\n'
+            return f"{TerminalColors.OKGREEN}For the period from {start_period} to {end_period}, the following contacts have birthdays in {number_days} days:{TerminalColors.ENDC}\n{f'{nl}'.join(str(p) for p in list_congratulate)}"
         else:
             return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
         

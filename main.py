@@ -28,7 +28,10 @@ def bye():
 
 @input_error
 def showall():
-    number = int(input("How many records would you like to retrieve in one iteration?\n>>> "))
+    try:
+        number = int(input("How many records would you like to retrieve in one iteration?\n>>> "))
+    except ValueError:
+        return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Provide number.{TerminalColors.ENDC}"
     result = contacts.iterator(number)
     for records_batch in result:
         for i in records_batch:
@@ -85,9 +88,9 @@ def search():
         elif choice.lower() == "note":
             break
         
+    return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
     
        
-
 command_maps = {
     "hello" : hello,
     "bye" : bye,
