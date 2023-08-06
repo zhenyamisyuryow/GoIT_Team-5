@@ -74,15 +74,30 @@ def add(items, name):
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been added.{TerminalColors.ENDC}"
 
 def congratulate():
+    while True:
+        try:
+            return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
+        except:
+            pass
+        
+def search():
+    while True:
+        choice = input(f"What would you like to search : {TerminalColors.HEADER}contact{TerminalColors.ENDC} or {TerminalColors.HEADER}note{TerminalColors.ENDC}: ")
+        if choice.lower() == "contact":
+            return contacts.search_contacts(input(f"Enter the query for search: "))
+        elif choice.lower() == "note":
+            break
+        
     return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
     
-
+       
 command_maps = {
     "hello" : hello,
     "bye" : bye,
     "add" : add,
     "showall" : showall,
-    "congratulate" : congratulate
+    "congratulate" : congratulate,
+    "search" : search
 }
 items_list = {
     "contact": True,
@@ -93,6 +108,7 @@ items_list = {
     "note": True,
 }
 
+
 def main():
     print("Welcome to Virtual Assistant!")
 
@@ -100,7 +116,7 @@ def main():
     
 
     while True:
-        print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, bye.{TerminalColors.ENDC}")
+        print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, search, bye.{TerminalColors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
             print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide a command.{TerminalColors.ENDC}")
@@ -111,7 +127,7 @@ def main():
             print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide valid command.{TerminalColors.ENDC}")
             continue
 
-        if command in ["hello", "showall", "congratulate"]:
+        if command in ["hello", "showall", "congratulate", "search"]:
             print(command_maps[command]())
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
