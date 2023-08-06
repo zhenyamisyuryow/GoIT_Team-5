@@ -81,9 +81,8 @@ class Birthday(Field):
                 self.__value = res_data.date()
             else:
                 print(f"Date of birth cannot be in the future! Please try again")
-        except ValueError:
-
-            print(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
+        except:
+            raise ValueError(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
     
     def __str__(self) -> str:
         try:
@@ -261,4 +260,3 @@ class TerminalColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     
-

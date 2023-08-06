@@ -45,26 +45,29 @@ def add(items, name):
         if item == "contact":
             if name not in contacts:
                 phone = input("Enter the phone: ")
-                record = Record(name, phone)
+                try:
+                    record = Record(name, phone)
+                except Exception as e:
+                    return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}{e}{TerminalColors.ENDC}"
                 contacts.add_record(record)
             else:
                 return "Contact already exists."
         else:
-            record:Record = contacts[name]
-            if item == "phone":
-                phone = input("Enter the phone: ")
-                record.add_phone(phone)
-            elif item == "email":
-                email = input("Enter the email: ")
-                record.add_email(email)
-            elif item == "birthday":
-                birthday = input("Enter the birthday: ")
-                record.add_birthday(birthday)
-            elif item == "address":
-                address = input("Enter the address: ")
-                record.add_address(address)
-            else:
-                return f"{TerminalColors.FAIL}Error: Invalid item.{TerminalColors.ENDC}"
+            try:
+                record:Record = contacts[name]
+            except KeyError:
+                return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: contact {name} doesn't exist.{TerminalColors.ENDC}"
+            item_maps = {
+                "phone": record.add_phone,
+                "email": record.add_email,
+                "birthday": record.add_birthday,
+                "address": record.add_address,
+            }
+            item_input = input(f"Enter the {item}: ")
+            try:
+                item_maps[item](item_input)
+            except Exception as e:
+                return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}{e}{TerminalColors.ENDC}"
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been added.{TerminalColors.ENDC}"
 
 
@@ -90,12 +93,12 @@ def main():
         print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall.{TerminalColors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
-            print("Provide a command.")
+            print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide a command.{TerminalColors.ENDC}")
             continue
         command = user_input.split()[0]
 
         if command not in command_maps:
-            print("Provide valid command.")
+            print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide valid command.{TerminalColors.ENDC}")
             continue
 
         if command in ["hello", "showall"]:
@@ -106,7 +109,12 @@ def main():
             break
         else:
             items = input(f"What would you like to {command}?: ").split(', ')
-
+            try:
+                [items_list[item] for item in items]
+            except KeyError as e:
+                print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: can not {command} {e}.{TerminalColors.ENDC}")
+                print(f"{TerminalColors.HEADER}Available options are: {', '.join(items_list.keys())}.{TerminalColors.ENDC}")
+                continue
             name = input("Enter the name: ")
             
             print(command_maps[command](items, name))
