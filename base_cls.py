@@ -1,10 +1,25 @@
 from collections import UserDict
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import pickle
 
 class Field:
-    pass
+    def __init__(self, value) -> None:
+        self.value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, new_value):
+        self._value = new_value
+
+    def __str__(self) -> str:
+        return self.value
+
+    def __repr__(self) -> str:
+        return str(self)
 
 
 class Name(Field):
@@ -23,12 +38,10 @@ class Phone(Field):
     def value(self, phone):
         result = re.findall(r"\+380{1}[(]{1}\d{2}[)]{1}[-]{1}\d{3}[-]{1}\d{2}[-]{1}\d{2}", phone)
         if not result:
-            raise ValueError(f"Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX")
+            raise ValueError(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX{TerminalColors.ENDC}")
         
         self.__value= "+"+re.sub(r"(\D)","",result[0])
         
-        
-
 
 
 
@@ -43,7 +56,7 @@ class Email(Field):
     
     @value.setter
     def value(self, email):
-        if re.match(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+        if re.match(r'^[a-z0-9]+[._\-+]*[a-z0-9]*@\w+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$', email):
             self.__value = email
         else:
             raise ValueError("Email should match the format johndoe@domain.com")
@@ -68,9 +81,8 @@ class Birthday(Field):
                 self.__value = res_data.date()
             else:
                 print(f"Date of birth cannot be in the future! Please try again")
-        except ValueError:
-
-            print(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
+        except:
+            raise ValueError(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
     
     def __str__(self) -> str:
         try:
@@ -79,7 +91,20 @@ class Birthday(Field):
         except AttributeError:
             return ""
 
-    
+    def __calc_birthday__(self):
+        today = datetime.now().date()
+        birth_date = self.value
+        if birth_date.month == 2 and birth_date.day == 29:
+            future_birthday = datetime(year = today.year, month = 2, day = birth_date.day - int(bool(today.year%4))).date()
+            
+            if future_birthday < today: 
+                future_birthday = datetime(year = today.year + 1, month = 2, day = birth_date.day - int(bool((today.year+1)%4))).date()
+            
+        else:
+            future_birthday = datetime(year = today.year, month = birth_date.month, day = birth_date.day).date()
+            if future_birthday < today:
+                future_birthday = future_birthday.replace(year = today.year + 1)
+        return (future_birthday - today).days
 
 
 class Address(Field):
@@ -133,11 +158,57 @@ class Record:
         else:
             self.address = Address(address)
 
-    def __repr__(self):
-        return f"Name: {self.name.value},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
-    
+
+    def __repr__(self):             #Вывести все поля для класса Record в строку
+        return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
+
+
 class Note(UserDict):
-    pass
+    def __init__(self, title: str = None, content: str = None, tags: list = None) -> None:
+        self.title = title
+        self.content = content
+        self.tags = tags or []
+
+    def add_title(self, title: str):
+        self.title = title
+
+    def add_content(self, content: str):
+        self.content = content
+
+    def add_tags(self, tags: list):
+        self.tags = tags
+
+    
+    def edit_title(self, title: str):
+        self.title = title
+
+    
+    def edit_content(self, content: str):
+        self.content = content
+
+    
+    def edit_tags(self, tags: list):
+        self.tags = tags
+
+    
+    def __repr__(self) -> str:
+        return f"Note(title='{self.title}', content='{self.content}', tags={self.tags})"
+
+class Notes(Note):
+    def __init__(self):
+        self.data = {}
+
+    
+    def add_note(self, name: str, title: str = None, content: str = None, tags: list = None):
+        note = Note(title, content, tags)
+        self.data[name] = note
+
+    
+    def get_note(self, name: str):
+        return self.data.get(name)
+
+    def delete_note(self, name: str):
+        return self.data.pop(name, None)
 
 
 class Contacts(UserDict):
@@ -167,3 +238,27 @@ class Contacts(UserDict):
                         contacts.append(record)
                         break
         return contacts
+    
+    def congratulate_period(self, number_days):
+        start_period = datetime.now().date()
+        end_period = start_period + timedelta(number_days)
+        list_congratulate = []
+        for record in self.data.values():
+            if record.birthday:
+                if record.birthday.__calc_birthday__() <= number_days:
+                    list_congratulate.append(record)
+        if list_congratulate:
+            return f"For the period from {start_period} to {end_period}, the following contacts have birthdays : {', '.join(str(p) for p in list_congratulate)}"
+        else:
+            return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
+class TerminalColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    
