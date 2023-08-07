@@ -67,12 +67,33 @@ def add(items, name):
                 return f"{TerminalColors.FAIL}Error: Invalid item.{TerminalColors.ENDC}"
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been added.{TerminalColors.ENDC}"
 
+@input_error
+def edit(items, name):
+    if name not in contacts:
+        return "Contact doesn't exist."
+
+    record = contacts[name]
+    for item in items:
+        if item == "phone":
+            phone_to_edit = input("Enter the phone you want to change: ")
+            new_phone = input("Enter the new phone number: ")
+            record.edit_phone(phone_to_edit, new_phone)
+        
+        elif item in record:
+            new_value = input(f"Enter the new {item}: ")
+            record[item] = new_value
+        
+        else:
+            return f"{TerminalColors.FAIL}Error: Invalid item.{TerminalColors.ENDC}"
+    return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been edited for {name}.{TerminalColors.ENDC}"
+
 
 command_maps = {
     "hello" : hello,
     "bye" : bye,
     "add": add,
     "showall": showall,
+    "edit": edit,
 }
 items_list = {
     "contact": True,
