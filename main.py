@@ -42,10 +42,17 @@ def add(items, name):
                 return "Contact already exists."
         elif item == "note":
             content = input("Enter the content: ")
-            tags = input("Add tags: ")
-            if tags:
-                tags.split(', ')
-            notes.add_note(Note(name, content, tags))
+            try:
+                tags = input("Add tags: ").lower().split(", ")
+                notes.add_note(Note(name, content, tags))
+            except:
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
+        elif item == "tags":
+            try:
+                tags = input("Add tags: ").lower().split(", ")
+                notes[name].add_tags(tags)
+            except:
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         else:
             try:
                 record:Record = contacts[name]
@@ -65,18 +72,20 @@ def add(items, name):
     return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been added.{Colors.ENDC}"
 
 
-@input_error
+# @input_error
 def edit(items, name):
     if name not in contacts:
-        return "Contact doesn't exist."
+        return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Contact doesn't exist.{Colors.ENDC}"
 
     record = contacts[name]
     phone_list = record.phones
     if "phone" in items and len(phone_list)>1:
-        print("Available phone numbers:")
-        for index, phone in enumerate(phone_list):
-            print(f"{index + 1}. {phone}")
+        try:
+            for i in range(len(phone_list)):
+                print(f"{i + 1}. {phone_list[i]}")
             choice = int(input("Select the phone number to edit (enter the number): ")) - 1
+        except:
+            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a digit.{Colors.ENDC}"
         if 0 <= choice < len(phone_list):
             new_phone = input("Enter the new phone number: ")
             record.edit_phone(phone_list[choice], new_phone)
@@ -113,11 +122,12 @@ def search():
     
 @input_error
 def showall():
-    item = input("Available options: contacts, notes\nWhat would you like to see?: ")
+    item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ")
     if not item or item not in ["contacts", "notes"]:
         return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {len(contacts)}.{Colors.ENDC}"
     elif item == "notes":
         result = [str(x) for x in notes.values()]
+        print("\n")
         return '\n'.join(result)
     else:
         try:
@@ -141,6 +151,7 @@ command_maps = {
     "search" : search,
     "showall" : showall,
     "congratulate" : congratulate,
+    "edit" : edit,
 }
 items_list = {
     "contact": True,
@@ -149,6 +160,7 @@ items_list = {
     "birthday": True, 
     "address": True, 
     "note": True,
+    "tags": True,
 }
 
 def main():
@@ -165,10 +177,6 @@ def main():
             continue
         command = user_input.split()[0]
 
-        if command not in command_maps:
-            print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
-            continue
-
         if command in ["hello", "showall", "congratulate", "search"]:
             print(command_maps[command]())
             continue
@@ -176,6 +184,9 @@ def main():
             print(command_maps["bye"]())
             contacts.save_book()
             break
+        elif command not in command_maps:
+            print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
+            continue
         else:
             items = input(f"What would you like to {command}?: ").split(', ')
             try:
