@@ -81,8 +81,9 @@ class Birthday(Field):
                 self.__value = res_data.date()
             else:
                 print(f"Date of birth cannot be in the future! Please try again")
-        except:
-            raise ValueError(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
+        except ValueError:
+
+            print(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
     
     def __str__(self) -> str:
         try:
@@ -120,48 +121,46 @@ class Record:
         self.email = Email(email) if email else None
         self.address = Address(address) if address else None
 
-    def add_phone(self, phone):
+    def add_phone(self, phone):             #Добавить номер телефона
         self.phones.append(Phone(phone))
 
-    def edit_phone(self, old_phone, new_phone):
+    def edit_phone(self, old_phone, new_phone):         #Изменить номер телефона
         if old_phone in self.phones:
             index = self.phones.index(old_phone)
             self.phones[index] = new_phone
 
-    def delete_phone(self, phone):
+    def delete_phone(self, phone):          #Удалить номер телефона
         self.phones.remove(phone)
 
-    def add_birthday(self, birthday):
+    def add_birthday(self, birthday):           #Добавить даты рождения
         self.birthday = Birthday(birthday)
 
-    def edit_birthday(self, birthday):
+    def edit_birthday(self, birthday):      #Изменить дату рождения
         if self.birthday:
             self.birthday.value = birthday
         else:
             self.birthday = Birthday(birthday)
 
-    def add_email(self, email):
+    def add_email(self, email):         #Добавить почту
         self.email = Email(email)
 
-    def edit_email(self, email):
+    def edit_email(self, email):        #Изменить почту
         if self.email:
             self.email.value = email
         else:
             self.email = Email(email)
 
-    def add_address(self, address):
+    def add_address(self, address):         #Добавить домашний адрес
         self.address = Address(address)
 
-    def edit_address(self, address):
+    def edit_address(self, address):            #Изменить домашний адрес
         if self.address:
             self.address.value = address
         else:
             self.address = Address(address)
 
-
     def __repr__(self):             #Вывести все поля для класса Record в строку
         return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
-
 
 class Note(UserDict):
     def __init__(self, title: str = None, content: str = None, tags: list = None) -> None:
@@ -213,8 +212,6 @@ class Notes(Note):
 
 
 class Contacts(UserDict):
-    
-    filename = "data.bin"
    
     def add_record(self, record: Record):       #Добавление записи
         self.data[record.name.value] = record
@@ -230,17 +227,17 @@ class Contacts(UserDict):
         for i in range(0, len(records), num_records):
             yield records[i:i + num_records]
 
-    def search_contacts(self, query):           #Функционал поиска в контактной книге
+    def search_contacts(self, query):
         contacts = []
         for record in self.data.values():
             if query.lower() in str(record.name).lower():
-                contacts.append(str(record))
+                contacts.append(record)
             else:
                 for phone in record.phones:
                     if query in phone.value:
-                        contacts.append(str(record))
+                        contacts.append(record)
                         break
-        return '\n\n'.join(contacts)
+        return contacts
     
     def congratulate_period(self, number_days):
         start_period = datetime.now().date()
@@ -248,27 +245,12 @@ class Contacts(UserDict):
         list_congratulate = []
         for record in self.data.values():
             if record.birthday:
-                if record.birthday.__calc_birthday__() <= number_days:
+                if record._Birthday__calc_birthday() <= number_days:
                     list_congratulate.append(record)
         if list_congratulate:
-            nl = '\n\n'
-            return f"{TerminalColors.OKGREEN}For the period from {start_period} to {end_period}, the following contacts have birthdays in {number_days} days:{TerminalColors.ENDC}\n{f'{nl}'.join(str(p) for p in list_congratulate)}"
+            return f"For the period from {start_period} to {end_period}, the following contacts have birthdays in : {', '.join(str(p) for p in list_congratulate)}"
         else:
             return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
-        
-    def load_book(self):
-
-        try:
-            with open(self.filename, "rb") as fh:
-                self.data = pickle.load(fh)
-        except FileNotFoundError:
-            pass
-    
-    def save_book(self):
-        with open(self.filename, "wb") as fh:
-            pickle.dump(self.data, fh)   
-    
-        
 class TerminalColors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -280,3 +262,4 @@ class TerminalColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     
+
