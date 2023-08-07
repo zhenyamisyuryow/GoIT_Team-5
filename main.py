@@ -65,7 +65,32 @@ def add(items, name):
     return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been added.{Colors.ENDC}"
 
 
+@input_error
+def edit(items, name):
+    if name not in contacts:
+        return "Contact doesn't exist."
 
+    record = contacts[name]
+    phone_list = record.phones
+    if "phone" in items and len(phone_list)>1:
+        print("Available phone numbers:")
+        for index, phone in enumerate(phone_list):
+            print(f"{index + 1}. {phone}")
+            choice = int(input("Select the phone number to edit (enter the number): ")) - 1
+        if 0 <= choice < len(phone_list):
+            new_phone = input("Enter the new phone number: ")
+            record.edit_phone(phone_list[choice], new_phone)
+            return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! Phone number edited for {name}.{Colors.ENDC}"
+        else:
+            return "Invalid choice."
+    for item in items:
+        if item in record:
+            new_value = input(f"Enter the new {item}: ")
+            record[item] = new_value
+        
+        else:
+            return f"{Colors.FAIL}Error: Invalid item.{Colors.ENDC}"
+    return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been edited for {name}.{Colors.ENDC}"
 
 @input_error
 def congratulate():
