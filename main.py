@@ -7,6 +7,7 @@ contacts = Contacts()
 notes = Notes()
 
 
+
 def load_books():
     global contacts, notes
     
@@ -35,6 +36,8 @@ def save_books(contacts, notes):
 
 
 
+
+
 def input_error(func):
     def handler(*args):
         argnames = func.__code__.co_varnames[:func.__code__.co_argcount]
@@ -58,6 +61,7 @@ def bye():
     return "Good bye!"
 
 
+
 @input_error
 def showall():
     try:
@@ -74,6 +78,8 @@ def showall():
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Total contacts: {len(contacts)}.{TerminalColors.ENDC}"
 
 
+
+
 @input_error
 def add(items, name):
     for item in items:
@@ -83,15 +89,28 @@ def add(items, name):
                 try:
                     record = Record(name, phone)
                 except Exception as e:
-                    return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}{e}{TerminalColors.ENDC}"
+                    return f"{Colors.FAIL}{Colors.UNDERLINE}{e}{Colors.ENDC}"
                 contacts.add_record(record)
             else:
                 return "Contact already exists."
+        elif item == "note":
+            content = input("Enter the content: ")
+            try:
+                tags = input("Add tags: ").lower().split(", ")
+                notes.add_note(Note(name, content, tags))
+            except:
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
+        elif item == "tags":
+            try:
+                tags = input("Add tags: ").lower().split(", ")
+                notes[name].add_tags(tags)
+            except:
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         else:
             try:
                 record:Record = contacts[name]
             except KeyError:
-                return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: contact {name} doesn't exist.{TerminalColors.ENDC}"
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: contact {name} doesn't exist.{Colors.ENDC}"
             item_maps = {
                 "phone": record.add_phone,
                 "email": record.add_email,
@@ -102,16 +121,49 @@ def add(items, name):
             try:
                 item_maps[item](item_input)
             except Exception as e:
-                return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}{e}{TerminalColors.ENDC}"
-    return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been added.{TerminalColors.ENDC}"
+                return f"{Colors.FAIL}{Colors.UNDERLINE}{e}{Colors.ENDC}"
+    return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been added.{Colors.ENDC}"
 
 
+
+
+# @input_error
+def edit(items, name):
+    if name not in contacts:
+        return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Contact doesn't exist.{Colors.ENDC}"
+
+    record = contacts[name]
+    phone_list = record.phones
+    if "phone" in items and len(phone_list)>1:
+        try:
+            for i in range(len(phone_list)):
+                print(f"{i + 1}. {phone_list[i]}")
+            choice = int(input("Select the phone number to edit (enter the number): ")) - 1
+        except:
+            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a digit.{Colors.ENDC}"
+        if 0 <= choice < len(phone_list):
+            new_phone = input("Enter the new phone number: ")
+            record.edit_phone(phone_list[choice], new_phone)
+            return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! Phone number edited for {name}.{Colors.ENDC}"
+        else:
+            return "Invalid choice."
+    for item in items:
+        if item in record:
+            new_value = input(f"Enter the new {item}: ")
+            record[item] = new_value
+        
+        else:
+            return f"{Colors.FAIL}Error: Invalid item.{Colors.ENDC}"
+    return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been edited for {name}.{Colors.ENDC}"
+
+@input_error
 def congratulate():
     while True:
         try:
             return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
         except:
             pass
+
 
 
 @input_error       
@@ -143,9 +195,12 @@ def delete():
     
         
         
+
+@input_error   
+
 def search():
     while True:
-        choice = input(f"What would you like to search : {TerminalColors.HEADER}contact{TerminalColors.ENDC} or {TerminalColors.HEADER}note{TerminalColors.ENDC}: ")
+        choice = input(f"What would you like to search : {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}: ")
         if choice.lower() == "contact":
             return contacts.search_contacts(input(f"Enter the query for search: "))
         elif choice.lower() == "note":
@@ -153,16 +208,43 @@ def search():
         
     
     
+@input_error
+def showall():
+    item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ")
+    if not item or item not in ["contacts", "notes"]:
+        return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {len(contacts)}.{Colors.ENDC}"
+    elif item == "notes":
+        result = [str(x) for x in notes.values()]
+        print("\n")
+        return '\n'.join(result)
+    else:
+        try:
+            number = int(input("How many records would you like to retrieve in one iteration?\n>>> "))
+        except ValueError:
+            return f"{Colors.FAIL}{Colors.UNDERLINE}Provide number.{Colors.ENDC}"
+        result = contacts.iterator(number)
+        for records_batch in result:
+            for i in records_batch:
+                print(i,"\n")
+            answer = input("Press Enter to continue. Press Q to exit.\n>>> ")
+            if answer.upper() == "Q":
+                break
+        return f"{Colors.OKGREEN}{Colors.UNDERLINE}Total contacts: {len(contacts)}.{Colors.ENDC}"
+
        
           
 command_maps = {
     "hello" : hello,
     "bye" : bye,
     "add" : add,
+    "search" : search,
     "showall" : showall,
     "congratulate" : congratulate,
+
     "search" : search,
     "delete" : delete
+    "edit" : edit,
+
 }
 items_list = {
     "contact": True,
@@ -171,8 +253,8 @@ items_list = {
     "birthday": True, 
     "address": True, 
     "note": True,
+    "tags": True,
 }
-
 
 def main():
     print("Welcome to Virtual Assistant!")
@@ -181,33 +263,39 @@ def main():
     
 
     while True:
-        print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, search, bye.{TerminalColors.ENDC}")
+        print(f"\n{Colors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, search, bye.{Colors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
-            print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide a command.{TerminalColors.ENDC}")
+            print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}")
             continue
         command = user_input.split()[0]
+
 
         if command not in command_maps:
             print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide valid command.{TerminalColors.ENDC}")
             continue
 
         if command in ["hello", "showall", "congratulate", "search", "delete"]:
+
+
             print(command_maps[command]())
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
             print(command_maps["bye"]())
             save_books(contacts, notes)
             break
+        elif command not in command_maps:
+            print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
+            continue
         else:
             items = input(f"What would you like to {command}?: ").split(', ')
             try:
                 [items_list[item] for item in items]
             except KeyError as e:
-                print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: can not {command} {e}.{TerminalColors.ENDC}")
-                print(f"{TerminalColors.HEADER}Available options are: {', '.join(items_list.keys())}.{TerminalColors.ENDC}")
+                print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: can not {command} {e}.{Colors.ENDC}")
+                print(f"{Colors.HEADER}Available options are: {', '.join(items_list.keys())}.{Colors.ENDC}")
                 continue
-            name = input("Enter the name: ")
+            name = input("Enter the name (or title): ")
             
             print(command_maps[command](items, name))
 

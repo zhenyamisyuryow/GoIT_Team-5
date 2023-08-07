@@ -29,59 +29,43 @@ class Name(Field):
     pass
 
 class Phone(Field):
-    def __init__(self, phone):
-        self.__value = None
-        self.value = phone
+    def __init__(self, value):
+        self.value = value
 
-    @property
-    def value(self):
-        return self.__value
-
-    @value.setter
+    @Field.value.setter
     def value(self, phone):
         result = re.findall(r"\+380{1}[(]{1}\d{2}[)]{1}[-]{1}\d{3}[-]{1}\d{2}[-]{1}\d{2}", phone)
         if not result:
-            raise ValueError(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX{TerminalColors.ENDC}")
+            raise ValueError(f"{Colors.FAIL}{Colors.UNDERLINE}Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX{Colors.ENDC}")
         
-        self.__value= "+"+re.sub(r"(\D)","",result[0])
+        self._value= "+"+re.sub(r"(\D)","",result[0])
         
 
 
 
 class Email(Field):
-    def __init__(self, email):
-        self.__value = None
-        self.value = email
-        
-    @property
-    def value(self):
-        return self.__value
-    
-    @value.setter
+    def __init__(self, value):
+        self.value = value
+
+    @Field.value.setter
     def value(self, email):
         if re.match(r'^[a-z0-9]+[._\-+]*[a-z0-9]*@\w+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$', email):
-            self.__value = email
+            self._value = email
         else:
             raise ValueError("Email should match the format johndoe@domain.com")
 
 
 class Birthday(Field):
-    def __init__(self, value : str = None):
-        self.__value = None
+    def __init__(self, value):
         self.value = value
 
-    @property
-    def value(self):
-        return self.__value
-
-
-    @value.setter
+    @Field.value.setter
     def value(self, value):
         try:
             result = re.findall(r"\d\d-\d\d-\d{4}", value)
             res_data = datetime.strptime(result[0], '%d-%m-%Y')
             if res_data <= datetime.now():
-                self.__value = res_data.date()
+                self._value = res_data.date()
             else:
                 print(f"Date of birth cannot be in the future! Please try again")
         except:
@@ -127,9 +111,9 @@ class Record:
         self.phones.append(Phone(phone))
 
     def edit_phone(self, old_phone, new_phone):
-        if old_phone in self.phones:
-            index = self.phones.index(old_phone)
-            self.phones[index] = new_phone
+        index = self.phones.index(old_phone)
+        self.phones[index] = Phone(new_phone)
+
 
     def delete_phone(self, phone : Phone):
             
@@ -167,16 +151,34 @@ class Record:
         else:
             self.address = Address(address)
 
+    def __iter__(self):
+        self._iter_index = 0
+        self._fields = [
+            self.name,
+            *self.phones,
+            self.birthday,
+            self.email,
+            self.address
+        ]
+        return self
+
+    def __next__(self):
+        if self._iter_index < len(self._fields):
+            value = self._fields[self._iter_index]
+            self._iter_index += 1
+            return value
+        else:
+            raise StopIteration
 
     def __repr__(self):             #Вывести все поля для класса Record в строку
         return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
 
 
-class Note(UserDict):
-    def __init__(self, title: str = None, content: str = None, tags: list = None) -> None:
+class Note():
+    def __init__(self, title: str = None, content: str = None, tags: list = None):
         self.title = title
         self.content = content
-        self.tags = tags or []
+        self.tags = tags
 
     def add_title(self, title: str):
         self.title = title
@@ -184,9 +186,9 @@ class Note(UserDict):
     def add_content(self, content: str):
         self.content = content
 
-    def add_tags(self, tags_str: str):
-        tags_list = tags_str.split(",") # Convert the input string to a list of tags
-        self.tags.extend(tags_list)
+    def add_tags(self, tags: list):
+        if tags:
+            self.tags.extend(tags)
 
     
     def edit_title(self, title: str):
@@ -201,10 +203,12 @@ class Note(UserDict):
         self.tags = tags
 
     
+
     def __repr__(self) -> str:
         return f"Note(title='{self.title}', content='{self.content}', tags={self.tags})"
 
 class Notes(Note):
+  
     def __init__(self):
         self.data = {}
         
@@ -213,9 +217,14 @@ class Notes(Note):
         note = Note(title, content, tags)
         self.data[name] = note
 
+
+    def __str__(self) -> str:
+        return f"Title: {self.title},\nContent: {self.content},\nTags: {self.tags}"
+
     
-    def get_note(self, name: str):
-        return self.data.get(name)
+    def get_note(self, title: str):
+        return self.data.get(title)
+
 
     def delete_note(self, name: str):
         try:
@@ -269,13 +278,13 @@ class Contacts(UserDict):
                     list_congratulate.append(record)
         if list_congratulate:
             nl = '\n\n'
-            return f"{TerminalColors.OKGREEN}For the period from {start_period} to {end_period}, the following contacts have birthdays in {number_days} days:{TerminalColors.ENDC}\n{f'{nl}'.join(str(p) for p in list_congratulate)}"
+            return f"{Colors.OKGREEN}For the period from {start_period} to {end_period}, the following contacts have birthdays in {number_days} days:{Colors.ENDC}\n{f'{nl}'.join(str(p) for p in list_congratulate)}"
         else:
             return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
         
     
         
-class TerminalColors:
+class Colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
