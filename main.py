@@ -6,7 +6,7 @@ contacts = Contacts()
 
 def input_error(func):
     def handler(*args):
-        argnames = func.__code__.co_varnames[:func.__code__.co_argcount]
+        argnames = func.__code__.co_varnames[: func.__code__.co_argcount]
         try:
             return func(*args)
         except KeyError:
@@ -17,25 +17,30 @@ def input_error(func):
             return "Error: provide both name and phone number."
         except TypeError:
             return f"Error: required parameters are: {', '.join(argnames)}"
+
     return handler
 
 
 def hello():
     return "Hello!"
 
+
 def bye():
     return "Good bye!"
+
 
 @input_error
 def showall():
     try:
-        number = int(input("How many records would you like to retrieve in one iteration?\n>>> "))
+        number = int(
+            input("How many records would you like to retrieve in one iteration?\n>>> ")
+        )
     except ValueError:
         return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Provide number.{TerminalColors.ENDC}"
     result = contacts.iterator(number)
     for records_batch in result:
         for i in records_batch:
-            print(i,"\n")
+            print(i, "\n")
         answer = input("Press Enter to continue. Press Q to exit.\n>>> ")
         if answer.upper() == "Q":
             break
@@ -57,7 +62,7 @@ def add(items, name):
                 return "Contact already exists."
         else:
             try:
-                record:Record = contacts[name]
+                record: Record = contacts[name]
             except KeyError:
                 return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: contact {name} doesn't exist.{TerminalColors.ENDC}"
             item_maps = {
@@ -73,59 +78,77 @@ def add(items, name):
                 return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}{e}{TerminalColors.ENDC}"
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been added.{TerminalColors.ENDC}"
 
+
 @input_error
 def edit(items, name):
     if name not in contacts:
         return "Contact doesn't exist."
 
     record = contacts[name]
-    for item in items:
-        if item == "phone":
-            phone_to_edit = input("Enter the phone you want to change: ")
+    phone_list = record.phones
+    if "phone" in items and len(phone_list) > 1:
+        print("Available phone numbers:")
+        for index, phone in enumerate(phone_list):
+            print(f"{index + 1}. {phone}")
+            choice = (
+                int(input("Select the phone number to edit (enter the number): ")) - 1
+            )
+        if 0 <= choice < len(phone_list):
             new_phone = input("Enter the new phone number: ")
-            record.edit_phone(phone_to_edit, new_phone)
-        
-        elif item in record:
+            record.edit_phone(phone_list[choice], new_phone)
+            return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! Phone number edited for {name}.{TerminalColors.ENDC}"
+        else:
+            return "Invalid choice."
+    for item in items:
+        if item in record:
             new_value = input(f"Enter the new {item}: ")
             record[item] = new_value
-        
+
         else:
             return f"{TerminalColors.FAIL}Error: Invalid item.{TerminalColors.ENDC}"
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been edited for {name}.{TerminalColors.ENDC}"
 
+
 def congratulate():
     while True:
         try:
-            return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
+            return contacts.congratulate_period(
+                int(input(f"Enter the number of days for congratulations:> "))
+            )
         except:
             pass
-        
+
+
 def search():
     while True:
-        choice = input(f"What would you like to search : {TerminalColors.HEADER}contact{TerminalColors.ENDC} or {TerminalColors.HEADER}note{TerminalColors.ENDC}: ")
+        choice = input(
+            f"What would you like to search : {TerminalColors.HEADER}contact{TerminalColors.ENDC} or {TerminalColors.HEADER}note{TerminalColors.ENDC}: "
+        )
         if choice.lower() == "contact":
             return contacts.search_contacts(input(f"Enter the query for search: "))
         elif choice.lower() == "note":
             break
-        
-    return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
-    
-       
+
+    return contacts.congratulate_period(
+        int(input(f"Enter the number of days for congratulations:> "))
+    )
+
+
 command_maps = {
-    "hello" : hello,
-    "bye" : bye,
-    "add" : add,
-    "showall" : showall,
+    "hello": hello,
+    "bye": bye,
+    "add": add,
+    "showall": showall,
     "edit": edit,
-    "congratulate" : congratulate,
-    "search" : search
+    "congratulate": congratulate,
+    "search": search,
 }
 items_list = {
     "contact": True,
-    "phone": True, 
-    "email": True, 
-    "birthday": True, 
-    "address": True, 
+    "phone": True,
+    "email": True,
+    "birthday": True,
+    "address": True,
     "note": True,
 }
 
@@ -134,18 +157,23 @@ def main():
     print("Welcome to Virtual Assistant!")
 
     contacts.load_book()
-    
 
     while True:
-        print(f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, search, bye.{TerminalColors.ENDC}")
+        print(
+            f"\n{TerminalColors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, search, bye.{TerminalColors.ENDC}"
+        )
         user_input = input("Enter the command: ").lower()
         if not user_input:
-            print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide a command.{TerminalColors.ENDC}")
+            print(
+                f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide a command.{TerminalColors.ENDC}"
+            )
             continue
         command = user_input.split()[0]
 
         if command not in command_maps:
-            print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide valid command.{TerminalColors.ENDC}")
+            print(
+                f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide valid command.{TerminalColors.ENDC}"
+            )
             continue
 
         if command in ["hello", "showall", "congratulate", "search"]:
@@ -156,17 +184,20 @@ def main():
             contacts.save_book()
             break
         else:
-            items = input(f"What would you like to {command}?: ").split(', ')
+            items = input(f"What would you like to {command}?: ").split(", ")
             try:
                 [items_list[item] for item in items]
             except KeyError as e:
-                print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: can not {command} {e}.{TerminalColors.ENDC}")
-                print(f"{TerminalColors.HEADER}Available options are: {', '.join(items_list.keys())}.{TerminalColors.ENDC}")
+                print(
+                    f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: can not {command} {e}.{TerminalColors.ENDC}"
+                )
+                print(
+                    f"{TerminalColors.HEADER}Available options are: {', '.join(items_list.keys())}.{TerminalColors.ENDC}"
+                )
                 continue
             name = input("Enter the name: ")
-            
-            print(command_maps[command](items, name))
 
+            print(command_maps[command](items, name))
 
 
 if __name__ == "__main__":
