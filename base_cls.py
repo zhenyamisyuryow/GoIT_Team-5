@@ -108,12 +108,13 @@ class Record:
         self.phones.append(Phone(phone))
 
     def edit_phone(self, old_phone, new_phone):
-        if old_phone in self.phones:
-            index = self.phones.index(old_phone)
-            self.phones[index] = new_phone
+        index = self.phones.index(old_phone)
+        self.phones[index] = Phone(new_phone)
 
     def delete_phone(self, phone):
-        self.phones.remove(phone)
+        for item in self.phones:
+            if item.value == "phone":
+                self.phones.remove(item)
 
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
@@ -142,6 +143,25 @@ class Record:
         else:
             self.address = Address(address)
 
+    def __iter__(self):
+        self._iter_index = 0
+        self._fields = [
+            self.name,
+            *self.phones,
+            self.birthday,
+            self.email,
+            self.address
+        ]
+        return self
+
+    def __next__(self):
+        if self._iter_index < len(self._fields):
+            value = self._fields[self._iter_index]
+            self._iter_index += 1
+            return value
+        else:
+            raise StopIteration
+
     def __repr__(self):             #Вывести все поля для класса Record в строку
         return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
 
@@ -158,9 +178,9 @@ class Note():
     def add_content(self, content: str):
         self.content = content
 
-    def add_tags(self, tags_str: str):
-        tags_list = tags_str.split(",") # Convert the input string to a list of tags
-        self.tags.extend(tags_list)
+    def add_tags(self, tags: list):
+        if tags:
+            self.tags.extend(tags)
 
     
     def edit_title(self, title: str):
