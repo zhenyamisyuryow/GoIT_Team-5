@@ -1,7 +1,6 @@
 from collections import UserDict
 import re
 from datetime import datetime, timedelta
-import pickle
 
 class Field:
     def __init__(self, value) -> None:
@@ -20,6 +19,10 @@ class Field:
 
     def __repr__(self) -> str:
         return str(self)
+    
+    def __eq__(self, other) -> bool:
+        return self.value == other.value
+    
 
 
 class Name(Field):
@@ -128,8 +131,14 @@ class Record:
             index = self.phones.index(old_phone)
             self.phones[index] = new_phone
 
-    def delete_phone(self, phone):
-        self.phones.remove(phone)
+    def delete_phone(self, phone : Phone):
+            
+        try:   
+            self.phones.remove(phone)
+            return f"Phone {phone} was successfully deleted!"
+        except ValueError:
+            return f"There is no such number: {phone} in the contact list!"
+        
 
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
@@ -198,8 +207,8 @@ class Note(UserDict):
 class Notes(Note):
     def __init__(self):
         self.data = {}
-
-    
+        
+        
     def add_note(self, name: str, title: str = None, content: str = None, tags: list = None):
         note = Note(title, content, tags)
         self.data[name] = note
@@ -209,12 +218,16 @@ class Notes(Note):
         return self.data.get(name)
 
     def delete_note(self, name: str):
-        return self.data.pop(name, None)
+        try:
+            self.data.pop(name)
+            return(f"Note {name} was successfully deleted from the notes ")
+        except KeyError:
+            return f"There is no such note: {name} in the notes!"
+
 
 
 class Contacts(UserDict):
     
-    filename = "data.bin"
    
     def add_record(self, record: Record):       #Добавление записи
         self.data[record.name.value] = record
@@ -223,7 +236,11 @@ class Contacts(UserDict):
         return self.data.get(name)
 
     def delete_record(self, name):      #Удаление записи
-        return self.data.pop(name, None)
+        try:
+            self.data.pop(name)
+            return(f"Contact {name} was successfully deleted from the book ")
+        except KeyError:
+            return f"There is no such contact: {name} in the book!"
 
     def iterator(self, num_records):        #Итератор(Принимает число, возвращает генератор)
         records = list(self.data.values())
@@ -256,17 +273,6 @@ class Contacts(UserDict):
         else:
             return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
         
-    def load_book(self):
-
-        try:
-            with open(self.filename, "rb") as fh:
-                self.data = pickle.load(fh)
-        except FileNotFoundError:
-            pass
-    
-    def save_book(self):
-        with open(self.filename, "wb") as fh:
-            pickle.dump(self.data, fh)   
     
         
 class TerminalColors:
@@ -279,4 +285,12 @@ class TerminalColors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-    
+
+
+
+
+        
+
+
+
+

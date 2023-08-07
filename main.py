@@ -1,7 +1,38 @@
 from base_cls import *
+import pickle
 
 
+filename = "data.bin"
 contacts = Contacts()
+notes = Notes()
+
+
+def load_books():
+    global contacts, notes
+    
+    try:
+        with open (filename, "rb") as fh:
+
+            try:
+                contacts = pickle.load(fh)
+            except EOFError:
+                pass
+            
+            try:   
+                notes = pickle.load(fh)
+            except EOFError:
+                pass
+        return contacts, notes
+    except FileNotFoundError:
+        return contacts, notes
+
+    
+def save_books(contacts, notes):
+    with open (filename, "wb") as fh:
+        pickle.dump(contacts, fh)
+        pickle.dump(notes, fh)
+
+
 
 
 def input_error(func):
@@ -25,6 +56,7 @@ def hello():
 
 def bye():
     return "Good bye!"
+
 
 @input_error
 def showall():
@@ -73,12 +105,43 @@ def add(items, name):
                 return f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}{e}{TerminalColors.ENDC}"
     return f"{TerminalColors.OKGREEN}{TerminalColors.UNDERLINE}Success! {', '.join(items)} have been added.{TerminalColors.ENDC}"
 
+
 def congratulate():
     while True:
         try:
             return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
         except:
             pass
+
+
+@input_error       
+def delete_phone(name):
+        
+    return contacts[name].delete_phone(Phone(input(f"Enter the phone: ")))
+    
+    
+def delete_contact(name):
+    return contacts.delete_record(name)
+    
+
+def delete_note(name):
+    return notes.delete_note(name)
+    
+    
+
+@input_error       
+def delete():
+    delete_options = {
+        "phone" : delete_phone,
+        "contact" : delete_contact,
+        "note" : delete_note
+    }
+    
+    
+    command = input(f"What would you like to delete: {TerminalColors.HEADER}{', '.join(delete_options)}{TerminalColors.ENDC} ")
+    return delete_options[command](input(f"Enter the name of {command}: "))
+    
+        
         
 def search():
     while True:
@@ -88,16 +151,18 @@ def search():
         elif choice.lower() == "note":
             break
         
-    return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
+    
     
        
+          
 command_maps = {
     "hello" : hello,
     "bye" : bye,
     "add" : add,
     "showall" : showall,
     "congratulate" : congratulate,
-    "search" : search
+    "search" : search,
+    "delete" : delete
 }
 items_list = {
     "contact": True,
@@ -112,7 +177,7 @@ items_list = {
 def main():
     print("Welcome to Virtual Assistant!")
 
-    contacts.load_book()
+    contacts, notes = load_books()[0], load_books()[1]
     
 
     while True:
@@ -127,12 +192,12 @@ def main():
             print(f"{TerminalColors.FAIL}{TerminalColors.UNDERLINE}Error: Provide valid command.{TerminalColors.ENDC}")
             continue
 
-        if command in ["hello", "showall", "congratulate", "search"]:
+        if command in ["hello", "showall", "congratulate", "search", "delete"]:
             print(command_maps[command]())
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
             print(command_maps["bye"]())
-            contacts.save_book()
+            save_books(contacts, notes)
             break
         else:
             items = input(f"What would you like to {command}?: ").split(', ')
