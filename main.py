@@ -82,9 +82,16 @@ def search():
         if choice.lower() == "contact":
             return contacts.search_contacts(input(f"Enter the query for search: "))
         elif choice.lower() == "note":
-            break
+            result = notes.search_note(input("Enter the query for search: "))
+            if len(result) > 0:
+                print("\nSearch results:\n")
+                for i in result:
+                    print(str(i) + "\n")
+                break            
+            else:
+                print(f"No notes were found")        
         
-    return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
+    # return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
     
 @input_error
 def showall():
@@ -92,8 +99,13 @@ def showall():
     if not item or item not in ["contacts", "notes"]:
         return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {len(contacts)}.{Colors.ENDC}"
     elif item == "notes":
-        result = [str(x) for x in notes.values()]
-        return '\n'.join(result)
+        choice = input("Do you wish sort notes by tags? y/n: ")
+        if choice.lower() == "y":
+            result = [str(x) for x in notes.sort_by_tag()]
+            return '\n\n'.join(result)
+        elif choice.lower() == "n":    
+            result = [str(x) for x in notes.values()]
+            return '\n\n'.join(result)
     else:
         try:
             number = int(input("How many records would you like to retrieve in one iteration?\n>>> "))

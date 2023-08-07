@@ -188,6 +188,18 @@ class Notes(UserDict):
 
     def delete_note(self, title: str):
         return self.data.pop(title, None)
+    
+    def search_note(self, query: str):
+        notes_results = []        
+        for key, value in self.data.items():
+            if str(value).lower().find(query.lower()) != -1:
+                notes_results.append(value)
+        return notes_results
+    
+    def sort_by_tag(self):
+        sorted_notes = sorted(self.data.values(), key=lambda note: note.tags[0] if note.tags else "")
+        self.data = {note.title: note for note in sorted_notes}
+        return sorted_notes
 
 
 class Contacts(UserDict):
