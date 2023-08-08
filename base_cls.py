@@ -3,6 +3,18 @@ import re
 from datetime import datetime, timedelta
 import pickle
 
+
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class Field:
     def __init__(self, value) -> None:
         self.value = value
@@ -31,12 +43,10 @@ class Phone(Field):
 
     @Field.value.setter
     def value(self, phone):
-        result = re.findall(r"\+380{1}[(]{1}\d{2}[)]{1}[-]{1}\d{3}[-]{1}\d{2}[-]{1}\d{2}", phone)
+        result = re.findall(r"\+380{1}[(]{1}\d{2}[)]\d{3}[-]{1}\d{2}[-]{1}\d{2}$", phone)
         if not result:
-            raise ValueError(f"{Colors.FAIL}{Colors.UNDERLINE}Please enter correct phone numbers in the format: +380(XX)-XXX-XX-XX{Colors.ENDC}")
-        
-        self._value= "+"+re.sub(r"(\D)","",result[0])
-        
+            raise ValueError(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Please enter correct phone number in the format: +380(XX)XXX-XX-XX{Colors.ENDC}")
+        self._value = phone
 
 
 
@@ -49,7 +59,7 @@ class Email(Field):
         if re.match(r'^[a-z0-9]+[._\-+]*[a-z0-9]*@\w+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$', email):
             self._value = email
         else:
-            raise ValueError("Email should match the format johndoe@domain.com")
+            raise ValueError(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Invalid email format.{Colors.ENDC}")
 
 
 class Birthday(Field):
@@ -61,19 +71,17 @@ class Birthday(Field):
         try:
             result = re.findall(r"\d\d-\d\d-\d{4}", value)
             res_data = datetime.strptime(result[0], '%d-%m-%Y')
+        except:
+            raise ValueError(f"{Colors.FAIL}Please enter correct data in the format: {Colors.UNDERLINE}dd-mm-yyyy.{Colors.ENDC}")
+        else:
             if res_data <= datetime.now():
                 self._value = res_data.date()
             else:
-                print(f"Date of birth cannot be in the future! Please try again")
-        except:
-            raise ValueError(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
+                raise ValueError(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Date of birth cannot be in the future! Please try again.{Colors.ENDC}")
     
     def __str__(self) -> str:
-        try:
-            return f"date of birth: \033[34m{self.value.strftime('%d-%m-%y')}\033[0m"
+        return f"{self._value.strftime('%d-%m-%Y')}"
 
-        except AttributeError:
-            return ""
 
     def __calc_birthday__(self):
         today = datetime.now().date()
@@ -99,30 +107,24 @@ class Record:
         self.name = Name(name)
         self.phones = []
         if phone:
-            self.add_phone(phone)
+            self.phones.append(Phone(phone))
         self.birthday = Birthday(birthday) if birthday else None
         self.email = Email(email) if email else None
         self.address = Address(address) if address else None
 
     def add_phone(self, phone):
+        if not self.phones:
+            self.phones = []
         self.phones.append(Phone(phone))
 
-    def edit_phone(self, old_phone, new_phone):
-        index = self.phones.index(old_phone)
+    def edit_phone(self, index, new_phone):
         self.phones[index] = Phone(new_phone)
-
-    def delete_phone(self, choice):
-        return f"Phone {self.phones.pop(choice)} was successfully deleted!"
-
 
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
     def edit_birthday(self, birthday):
-        if self.birthday:
-            self.birthday.value = birthday
-        else:
-            self.birthday = Birthday(birthday)
+        self.birthday = Birthday(birthday)
 
     def add_email(self, email):
         self.email = Email(email)
@@ -179,20 +181,8 @@ class Note():
             self.tags.extend(tags)
 
     
-    def edit_title(self, title: str):
-        self.title = title
-
-    
-    def edit_content(self, content: str):
-        self.content = content
-
-    
-    def edit_tags(self, tags: list):
-        self.tags = tags
-
-    
     def __str__(self) -> str:
-        return f"Title: {self.title},\nContent: {self.content},\nTags: {self.tags}"
+        return f"\nTitle: {self.title.capitalize()},\nContent: {self.content.capitalize()},\nTags: {self.tags}"
 
 class Notes(UserDict):
     
@@ -201,6 +191,13 @@ class Notes(UserDict):
     
     def get_note(self, title: str):
         return self.data.get(title)
+
+    def edit_note(self, name, **kwargs):
+        note = self.data[name]
+        for key, value in kwargs.items():
+            print(key, value)
+            if value != '':
+                setattr(note, key, value)
 
     def delete_note(self, name: str):
         try:
@@ -269,10 +266,9 @@ class Contacts(UserDict):
                 if record.birthday.__calc_birthday__() <= number_days:
                     list_congratulate.append(record)
         if list_congratulate:
-            nl = '\n\n'
-            return f"{Colors.OKGREEN}For the period from {start_period} to {end_period}, the following contacts have birthdays in {number_days} days:{Colors.ENDC}\n{f'{nl}'.join(str(p) for p in list_congratulate)}"
-        else:
-            return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
+            print(f"{Colors.OKGREEN}For the period from {start_period} to {end_period}, the following contacts have birthdays in {number_days} days:\n{Colors.ENDC}")
+            return '\n\n'.join(str(p) for p in list_congratulate)
+        return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
         
     def load_book(self, file):
         try:
@@ -282,16 +278,3 @@ class Contacts(UserDict):
     
     def save_book(self, file):
         pickle.dump(self.data, file)   
-    
-
-class Colors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    
