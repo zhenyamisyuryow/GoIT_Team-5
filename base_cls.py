@@ -28,7 +28,9 @@ class Field:
         self._value = new_value
 
     def __str__(self) -> str:
-        return self.value
+        return self.value.capitalize()
+
+
 
     def __repr__(self) -> str:
         return str(self)
@@ -47,7 +49,6 @@ class Phone(Field):
         if not result:
             raise ValueError(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Please enter correct phone number in the format: +380(XX)XXX-XX-XX{Colors.ENDC}")
         self._value = phone
-
 
 
 class Email(Field):
@@ -164,7 +165,12 @@ class Record:
             raise StopIteration
 
     def __repr__(self):             #Вывести все поля для класса Record в строку
-        return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
+        return (f"Name: {self.name},"
+                f"\nPhones:\n{(','+str(chr(10))).join('Phone '+str(i+1)+': '+str(phone) for i, phone in enumerate(self.phones))},\n"
+                f"Email: {self.email},"
+                f"\nBirthday: {self.birthday},"
+                f"\nAddress: {self.address}")
+
 
 
 class Note():
@@ -205,7 +211,7 @@ class Notes(UserDict):
             return(f"Note {name} was successfully deleted from the notes ")
         except KeyError:
             return f"There is no such note: {name} in the notes!"
-    
+          
     def search_note(self, query: str):
         notes_results = []        
         for note in self.data.values():
@@ -217,7 +223,7 @@ class Notes(UserDict):
         sorted_notes = sorted(self.data.values(), key=lambda note: note.tags[0] if note.tags else "")
         self.data = {note.title: note for note in sorted_notes}
         return sorted_notes
-
+      
     def load_book(self, file):
         try:
             self.data = pickle.load(file)
@@ -250,7 +256,7 @@ class Contacts(UserDict):
         for i in range(0, len(records), num_records):
             yield records[i:i + num_records]
 
-    def search_contacts(self, query):
+    def search_contacts(self, query):           #Функционал поиска в контактной книге
         result = []
         for record in self.data.values():
             if query and query in str(vars(record).values()):

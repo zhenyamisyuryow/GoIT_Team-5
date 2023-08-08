@@ -45,7 +45,7 @@ def add(items, name):
             else:
                 return "Contact already exists."
         elif item == "note":
-            content = input("Enter the content: ")
+            content = input("Enter the content: ").lower()
             try:
                 tags = input("Add tags: ").lower().split(", ")
                 notes.add_note(Note(name, content, tags))
@@ -68,7 +68,7 @@ def add(items, name):
                 "birthday": record.add_birthday,
                 "address": record.add_address,
             }
-            item_input = input(f"Enter the {item}: ")
+            item_input = input(f"Enter the {item}: ").lower()
             try:
                 item_maps[item](item_input)
             except Exception as e:
@@ -194,7 +194,7 @@ def delete(items, name):
     
 @input_error
 def showall():
-    item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ")
+    item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ").lower()
     if not item or item not in ["contacts", "notes"]:
         return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {item}.{Colors.ENDC}"
     elif item == "notes":
@@ -286,7 +286,7 @@ def main():
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
             continue
         else:
-            items = input(f"What would you like to {command}?: ").split(', ')
+            items = input(f"What would you like to {command}?: ").lower().split(', ')
             for item in items:
                 if item == "note":
                     name = input("Enter note title: ").lower()
