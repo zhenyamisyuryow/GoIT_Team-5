@@ -212,13 +212,19 @@ class Notes(UserDict):
         except KeyError:
             return f"There is no such note: {name} in the notes!"
 
-
-
+    def load_book(self, file):
+        try:
+            self.data = pickle.load(file)
+        except EOFError:
+            pass
+    
+    def save_book(self, file):
+        pickle.dump(self.data, file)   
+    
 
 class Contacts(UserDict):
     
-    filename = "data.bin"
-   
+ 
     def add_record(self, record: Record):       #Добавление записи
         self.data[record.name.value] = record
 
@@ -264,17 +270,14 @@ class Contacts(UserDict):
         else:
             return f"For the period from {start_period} to {end_period}, there are no birthdays recorded in your book"
         
-    def load_book(self):
-
+    def load_book(self, file):
         try:
-            with open(self.filename, "rb") as fh:
-                self.data = pickle.load(fh)
-        except FileNotFoundError:
+            self.data = pickle.load(file)
+        except EOFError:
             pass
     
-    def save_book(self):
-        with open(self.filename, "wb") as fh:
-            pickle.dump(self.data, fh)   
+    def save_book(self, file):
+        pickle.dump(self.data, file)   
     
         
 class Colors:

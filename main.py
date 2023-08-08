@@ -3,6 +3,7 @@ from base_cls import *
 
 contacts = Contacts()
 notes = Notes()
+filename = "data.bin"
 
 def input_error(func):
     def handler(*args):
@@ -191,7 +192,19 @@ def showall():
                 break
         return f"{Colors.OKGREEN}{Colors.UNDERLINE}Total contacts: {len(contacts)}.{Colors.ENDC}"
 
-       
+def load_books(filename):
+    try:
+        with open(filename, "rb") as fh:
+            contacts.load_book(fh)
+            notes.load_book(fh)
+    except FileNotFoundError:
+        pass
+    
+def save_book(filename):
+    with open(filename, "wb") as fh:
+        contacts.save_book(fh)
+        notes.save_book(fh)   
+      
 command_maps = {
     "hello" : hello,
     "bye" : bye,
@@ -212,11 +225,11 @@ items_list = {
     "tags": True,
 }
 
+    
 def main():
     print("Welcome to Virtual Assistant!")
-
-    contacts.load_book()
     
+    load_books(filename)
 
     while True:
         print(f"\n{Colors.HEADER}Available commands: hello, add, edit, change, delete, showall, congratulate, search, bye.{Colors.ENDC}")
@@ -231,7 +244,7 @@ def main():
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
             print(command_maps["bye"]())
-            contacts.save_book()
+            save_book(filename)
             break
         elif command not in command_maps:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
