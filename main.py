@@ -77,7 +77,7 @@ def add(items, name):
 def edit(items, name):
     try:
         record: Record = contacts[name]
-    except KeyError:
+    except:
         return f"{Colors.FAIL}{Colors.UNDERLINE}Error: contact {name} doesn't exist.{Colors.ENDC}"
 
     item_maps = {
@@ -134,25 +134,24 @@ def congratulate():
 @input_error   
 def search():
     while True:
-        choice = input(f"What would you like to search : {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}: ")
-        if choice.lower() == "contact":
-            return contacts.search_contacts(input(f"Enter the query for search: "))
-        elif choice.lower() == "note":
-            result = notes.search_note(input("Enter the query for search: "))
-            if len(result) > 0:
-                print("\nSearch results:\n")
-                for i in result:
-                    print(str(i) + "\n")
-                break            
-            else:
-                print(f"No notes were found")        
+        choice = input(f"What would you like to search {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}?: ").lower()
+        if choice == "contact":
+            try:
+                return '\n' + contacts.search_contacts(input(f"Enter the query for search: "))
+            except:
+                print(f"{Colors.WARNING}{Colors.UNDERLINE}Provide query for the search!{Colors.ENDC}")
+                continue
+        elif choice == "note":
+            return notes.search_note(input("Enter the query for search: "))
+        else:
+            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Choose between available options: contact, note{Colors.ENDC}"     
         
 
 @input_error       
 def delete_phone(name):
     for i in range(len(contacts[name].phones)):
-                print(f"{i + 1}. {contacts[name].phones[i]}")
-    choice = int(input("Select the phone number to edit (enter the number): ")) - 1
+        print(f"{i + 1}. {contacts[name].phones[i]}")
+    choice = int(input("Select the phone number to delete (enter the number): ")) - 1
     return contacts[name].delete_phone(choice)
     
     
@@ -173,15 +172,15 @@ def delete():
     }
     
     command = input(f"What would you like to delete: {Colors.HEADER}{', '.join(delete_options)}{Colors.ENDC} ")
-    return delete_options[command](input(f"Enter the name of {command}: "))
+    return delete_options[command](input(f"Enter the name: "))
     
 @input_error
 def showall():
     item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ")
     if not item or item not in ["contacts", "notes"]:
-        return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {len(contacts)}.{Colors.ENDC}"
+        return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {item}.{Colors.ENDC}"
     elif item == "notes":
-        choice = input("Do you wish sort notes by tags? y/n: ")
+        choice = input("Do you wish to sort notes by tags? y/n: ")
         if choice.lower() == "y":
             result = [str(x) for x in notes.sort_by_tag()]
             return '\n\n'.join(result)
@@ -219,11 +218,11 @@ command_maps = {
     "hello" : hello,
     "bye" : bye,
     "add" : add,
+    "edit" : edit,
+    "delete" : delete,
     "search" : search,
     "showall" : showall,
     "congratulate" : congratulate,
-    "edit" : edit,
-    "delete" : delete
 }
 items_list = {
     "contact": True,
@@ -242,7 +241,7 @@ def main():
     load_books(filename)
 
     while True:
-        print(f"\n{Colors.HEADER}Available commands: hello, add, edit, change, delete, showall, congratulate, search, bye.{Colors.ENDC}")
+        print(f"\n{Colors.HEADER}Available commands: {', '.join(command_maps.keys())}.{Colors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}")
