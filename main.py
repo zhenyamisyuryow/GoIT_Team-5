@@ -1,4 +1,6 @@
 from base_cls import *
+import os
+import sort
 
 
 contacts = Contacts()
@@ -25,6 +27,7 @@ def hello():
     return "Hello!"
 
 def bye():
+    save_book(filename)
     return "Good bye!"
 
 
@@ -75,52 +78,61 @@ def add(items, name):
 
 @input_error
 def edit(items, name):
-    try:
-        record: Record = contacts[name]
-    except KeyError:
-        return f"{Colors.FAIL}{Colors.UNDERLINE}Error: contact {name} doesn't exist.{Colors.ENDC}"
-
-    item_maps = {
-        "phone": record.add_phone,
-        "email": record.add_email,
-        "birthday": record.add_birthday,
-        "address": record.add_address,
-    }
 
     for item in items:
-        if item == "phone":
-            if len(record.phones) == 1:
-                new_phone = input("Enter the new phone number: ")
+        if item == "note":
+            try:
+                title = input("Enter new title (Press Enter to skip): ").lower()
+                content = input("Enter new content (Press Enter to skip): ").lower()
+                tags = input("Enter new tags (Press Enter to skip): ").lower()
+                notes.edit_note(name, title = title, content=content, tags=tags)
+            except:
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: note with such name doesn't exist.{Colors.ENDC}"
+        else:
+            try:
+                record: Record = contacts[name]
+            except:
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: contact {name} doesn't exist.{Colors.ENDC}"
+
+            item_maps = {
+                "phone": record.edit_phone,
+                "email": record.edit_email,
+                "birthday": record.edit_birthday,
+                "address": record.edit_address,
+            }
+            if item == "phone":
+                if len(record.phones) == 1:
+                    new_phone = input("Enter the new phone number: ")
+                    try:
+                        record.phones[0] = Phone(new_phone)
+                    except Exception as e:
+                        return f"{Colors.FAIL}{Colors.UNDERLINE}{e}{Colors.ENDC}"
+                elif len(record.phones) > 1:
+                    print("Available phones:")
+                    for idx, phone in enumerate(record.phones):
+                        print(f"{idx + 1}. {phone}")
+                    try:
+                        choice = int(input("Enter the number of the phone to edit: "))-1
+                        if 0 <= choice < len(record.phones):
+                            new_phone = input("Enter the new phone number: ")
+                            try:
+                                record.phones[choice] = Phone(new_phone)
+                            except ValueError as e:
+                                return e
+                        else:
+                            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Invalid choice.{Colors.ENDC}"
+                    except ValueError:
+                        return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Invalid choice.{Colors.ENDC}"
+                else:
+                    return f"{Colors.FAIL}{Colors.UNDERLINE}Error: No phone numbers available.{Colors.ENDC}"
+            elif item in item_maps:
+                new_value = input(f"Enter the new {item}: ")
                 try:
-                    record.phones[0] = new_phone
+                    item_maps[item](new_value)
                 except Exception as e:
                     return f"{Colors.FAIL}{Colors.UNDERLINE}{e}{Colors.ENDC}"
-            elif len(record.phones) > 1:
-                print("Select a phone number to edit:")
-                for idx, phone in enumerate(record.phones):
-                    print(f"{idx + 1}. {phone}")
-                choice = input("Enter the number of the phone to edit: ")
-                try:
-                    choice_idx = int(choice) - 1
-                    if 0 <= choice_idx < len(record.phones):
-                        new_phone = input("Enter the new phone number: ")
-                        record.phones[choice_idx] = new_phone
-
-                    else:
-                        return "Error: Invalid choice."
-                except ValueError:
-                    return "Error: Invalid choice."
             else:
-                return "Error: No phone numbers available to edit."
-        elif item in item_maps:
-            new_value = input(f"Enter the new {item}: ")
-            try:
-                item_maps[item](new_value)
-
-            except Exception as e:
-                return f"{Colors.FAIL}{Colors.UNDERLINE}{e}{Colors.ENDC}"
-        else:
-            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: {item} cannot be edited.{Colors.ENDC}"
+                return f"{Colors.FAIL}{Colors.UNDERLINE}Error: {item} cannot be edited.{Colors.ENDC}"
     return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been edited.{Colors.ENDC}"
 
 @input_error
@@ -134,50 +146,67 @@ def congratulate():
 @input_error   
 def search():
     while True:
-        choice = input(f"What would you like to search : {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}: ").lower()
+        choice = input(f"What would you like to search {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}?: ").lower()
         if choice == "contact":
-            return contacts.search_contacts(input(f"Enter the query for search: "))
+            try:
+                return '\n' + contacts.search_contacts(input(f"Enter the query for search: "))
+            except:
+                print(f"{Colors.WARNING}{Colors.UNDERLINE}Provide query for the search!{Colors.ENDC}")
+                continue
         elif choice == "note":
-            return notes.search_note(input(f"Enter the query for search: "))
-        
+            return notes.search_note(input("Enter the query for search: "))
+        else:
+            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Choose between available options: contact, note{Colors.ENDC}"     
+    
+    
 @input_error       
-def delete_phone(name):
-    for i in range(len(contacts[name].phones)):
-                print(f"{i + 1}. {contacts[name].phones[i]}")
-    choice = int(input("Select the phone number to edit (enter the number): ")) - 1
-    return contacts[name].delete_phone(choice)
-    
-    
-def delete_contact(name):
-    return contacts.delete_record(name)
-    
-
-def delete_note(name):
-    return notes.delete_note(name)
-    
-    
-
-@input_error       
-def delete():
-    delete_options = {
-        "phone" : delete_phone,
-        "contact" : delete_contact,
-        "note" : delete_note
-    }
-    
-    command = input(f"What would you like to delete: {Colors.HEADER}{', '.join(delete_options)}{Colors.ENDC} ").lower()
-    return delete_options[command](input(f"Enter the name of {command}: ")).lower()
+def delete(items, name):
+    for item in items:
+        if item == "note":
+            try:
+                notes.pop(name)
+            except:
+                return f"{Colors.WARNING}{Colors.UNDERLINE}Note was not found.{Colors.ENDC}"
+        elif item == "contact":
+            try:
+                contacts.pop(name)
+            except:
+                return f"{Colors.WARNING}{Colors.UNDERLINE}Contact was not found.{Colors.ENDC}"
+        else:
+            record:Record = contacts[name]
+            for key, item in zip(vars(record), items):
+                if item == key:
+                    vars(record)[key] = None
+                elif item == "phone":
+                    if len(record.phones) <= 1:
+                        record.phones = None
+                    else:
+                        print("Available phones: ")
+                        for idx, phone in enumerate(record.phones):
+                            print(f"{idx + 1}. {phone}")
+                        try:
+                            choice = int(input("Enter the number of the phone to delete: ")) -1
+                            del record.phones[choice]
+                        except ValueError:
+                            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Invalid choice.{Colors.ENDC}"
+    return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {item} has been deleted!{Colors.ENDC}"
 
     
 @input_error
 def showall():
     item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ").lower()
     if not item or item not in ["contacts", "notes"]:
-        return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {len(contacts)}.{Colors.ENDC}"
+        return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {item}.{Colors.ENDC}"
     elif item == "notes":
-        result = [str(x) for x in notes.values()]
-        print("\n")
-        return '\n'.join(result)
+        if not notes:
+            return f"{Colors.WARNING}{Colors.UNDERLINE}No notes were found.{Colors.ENDC}"
+        choice = input("Do you wish to sort notes by tags? y/n: ")
+        if choice.lower() == "y":
+            result = [str(x) for x in notes.sort_by_tag()]
+            return '\n\n'.join(result)
+        elif choice.lower() == "n":    
+            result = [str(x) for x in notes.values()]
+            return '\n\n'.join(result)
     else:
         try:
             number = int(input("How many records would you like to retrieve in one iteration?\n>>> "))
@@ -203,17 +232,21 @@ def load_books(filename):
 def save_book(filename):
     with open(filename, "wb") as fh:
         contacts.save_book(fh)
-        notes.save_book(fh)   
+        notes.save_book(fh)
+
+def clean():
+    pass
       
 command_maps = {
     "hello" : hello,
     "bye" : bye,
     "add" : add,
+    "edit" : edit,
+    "delete" : delete,
     "search" : search,
     "showall" : showall,
     "congratulate" : congratulate,
-    "edit" : edit,
-    "delete" : delete
+    "clean folder": sort.organize_files
 }
 items_list = {
     "contact": True,
@@ -232,32 +265,36 @@ def main():
     load_books(filename)
 
     while True:
-        print(f"\n{Colors.HEADER}Available commands: hello, add, edit, delete, showall, congratulate, search, bye.{Colors.ENDC}")
+        print(f"\n{Colors.HEADER}Available commands: {', '.join(command_maps.keys())}.{Colors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}")
             continue
         command = user_input.split()[0]
 
-        if command in ["hello", "showall", "congratulate", "search", "delete"]:
+        if command in ["hello", "showall", "congratulate", "search"]:
             print(command_maps[command]())
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
             print(command_maps["bye"]())
-            save_book(filename)
             break
+        elif user_input == "clean folder":
+            folder = input("Enter the path of the folder to organize: ")
+            command_maps["clean folder"](folder)
+            continue
         elif command not in command_maps:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
             continue
         else:
             items = input(f"What would you like to {command}?: ").lower().split(', ')
-            try:
-                [items_list[item] for item in items]
-            except KeyError as e:
-                print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: can not {command} {e}.{Colors.ENDC}")
-                print(f"{Colors.HEADER}Available options are: {', '.join(items_list.keys())}.{Colors.ENDC}")
+            for item in items:
+                if item == "note":
+                    name = input("Enter note title: ").lower()
+                    print(command_maps[command]([item], name))
+                    items.remove(item)
+            if len(items) < 1:
                 continue
-            name = input("Enter the name (or title): ").lower()
+            name = input("Enter the name of the contact: ")
             print(command_maps[command](items, name))
 
 
