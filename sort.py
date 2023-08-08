@@ -14,6 +14,9 @@ def extract_archive(archive_path, target_folder):
         print(f"Unsupported archive format: {archive_path}")
 
 def organize_files(folder):
+    if not os.path.exists(folder):
+        return "Error: Folder does not exist."
+    
     file_types = {
         'Images': ['.jpg', '.jpeg', '.png', '.gif'],
         'Documents': ['.pdf', '.doc', '.docx', '.txt'],
@@ -61,19 +64,13 @@ def organize_files(folder):
                 archive_path = os.path.join(root, filename)
                 archive_name = os.path.splitext(filename)[0]  # Get archive name without extension
                 extract_folder = os.path.join(root, archive_name)
-                extract_archive(archive_path, extract_folder)
-                extracted_archive_path = os.path.join(root, archive_name)
-                moved_archive_path = os.path.join(archives_folder, filename)
-                if not os.path.exists(moved_archive_path):  # Check if destination doesn't exist
-                    shutil.move(extracted_archive_path, moved_archive_path)
-                os.remove(archive_path) 
-
-if __name__ == "__main__":
-    while True:
-        folder = input("Enter the path of the folder to organize: ")
-        if not os.path.exists(folder):
-            print("Folder does not exist.")
-        else:
-            organize_files(folder)
-            print("Sorting is complite!")
-            break
+                try:
+                    extract_archive(archive_path, extract_folder)
+                    extracted_archive_path = os.path.join(root, archive_name)
+                    moved_archive_path = os.path.join(archives_folder, filename)
+                    if not os.path.exists(moved_archive_path):  # Check if destination doesn't exist
+                        shutil.move(extracted_archive_path, moved_archive_path)
+                    os.remove(archive_path) 
+                except:
+                    print("Can not proceed with unpacking. Archive is corrupted.")
+    return "Sorting complete!"
