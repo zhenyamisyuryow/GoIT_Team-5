@@ -16,7 +16,9 @@ class Field:
         self._value = new_value
 
     def __str__(self) -> str:
-        return self.value
+        return self.value.capitalize()
+
+
 
     def __repr__(self) -> str:
         return str(self)
@@ -37,7 +39,8 @@ class Phone(Field):
         
         self._value= "+"+re.sub(r"(\D)","",result[0])
         
-
+    def __str__(self) -> str:
+        return '{}({})-{}-{}-{}'.format(self.value[0:4], self.value[4:6], self.value[6:9], self.value[9:11], self.value[11:13])
 
 
 class Email(Field):
@@ -67,10 +70,10 @@ class Birthday(Field):
                 print(f"Date of birth cannot be in the future! Please try again")
         except:
             raise ValueError(f"Please enter correct data in the format: \033[34mmm-dd-yyyy\033[0m")
-    
+
     def __str__(self) -> str:
         try:
-            return f"date of birth: \033[34m{self.value.strftime('%d-%m-%y')}\033[0m"
+            return f"\033[34m{self.value.strftime('%d-%m-%y')}\033[0m"
 
         except AttributeError:
             return ""
@@ -162,7 +165,12 @@ class Record:
             raise StopIteration
 
     def __repr__(self):             #Вывести все поля для класса Record в строку
-        return f"Name: {self.name},\nPhones: {self.phones},\nEmail: {self.email},\nBirthday: {self.birthday},\nAddress: {self.address}"
+        return (f"Name: {self.name},"
+                f"\nPhones:\n{(','+str(chr(10))).join('Phone '+str(i+1)+': '+str(phone) for i, phone in enumerate(self.phones))},\n"
+                f"Email: {self.email},"
+                f"\nBirthday: {self.birthday},"
+                f"\nAddress: {self.address}")
+
 
 
 class Note():
@@ -211,7 +219,19 @@ class Notes(UserDict):
             return(f"Note {name} was successfully deleted from the notes ")
         except KeyError:
             return f"There is no such note: {name} in the notes!"
-
+        
+    def search_note(self, query: str):
+        notes_results = []        
+        for note in self.data.values():
+            if query in str(vars(note)):
+                notes_results.append(str(note))
+        return '\n\n'.join(notes_results) if notes_results else f"{Colors.WARNING}{Colors.UNDERLINE}No notes were found.{Colors.ENDC}"
+    
+    def sort_by_tag(self):
+        sorted_notes = sorted(self.data.values(), key=lambda note: note.tags[0] if note.tags else "")
+        self.data = {note.title: note for note in sorted_notes}
+        return sorted_notes
+    
     def load_book(self, file):
         try:
             self.data = pickle.load(file)
@@ -245,16 +265,13 @@ class Contacts(UserDict):
             yield records[i:i + num_records]
 
     def search_contacts(self, query):           #Функционал поиска в контактной книге
-        contacts = []
+        result = []
         for record in self.data.values():
-            if query.lower() in str(record.name).lower():
-                contacts.append(str(record))
-            else:
-                for phone in record.phones:
-                    if query in phone.value:
-                        contacts.append(str(record))
-                        break
-        return '\n\n'.join(contacts)
+            if query and query in str(vars(record).values()):
+                result.append(str(record))
+        return '\n\n'.join(result) if result else f"{Colors.WARNING}{Colors.UNDERLINE}Nothing was found{Colors.ENDC}"
+    
+
     
     def congratulate_period(self, number_days):
         start_period = datetime.now().date()

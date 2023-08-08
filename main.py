@@ -42,7 +42,7 @@ def add(items, name):
             else:
                 return "Contact already exists."
         elif item == "note":
-            content = input("Enter the content: ")
+            content = input("Enter the content: ").lower()
             try:
                 tags = input("Add tags: ").lower().split(", ")
                 notes.add_note(Note(name, content, tags))
@@ -65,7 +65,7 @@ def add(items, name):
                 "birthday": record.add_birthday,
                 "address": record.add_address,
             }
-            item_input = input(f"Enter the {item}: ")
+            item_input = input(f"Enter the {item}: ").lower()
             try:
                 item_maps[item](item_input)
             except Exception as e:
@@ -134,11 +134,11 @@ def congratulate():
 @input_error   
 def search():
     while True:
-        choice = input(f"What would you like to search : {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}: ")
-        if choice.lower() == "contact":
+        choice = input(f"What would you like to search : {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}: ").lower()
+        if choice == "contact":
             return contacts.search_contacts(input(f"Enter the query for search: "))
-        elif choice.lower() == "note":
-            break
+        elif choice == "note":
+            return notes.search_note(input(f"Enter the query for search: "))
         
 @input_error       
 def delete_phone(name):
@@ -165,13 +165,13 @@ def delete():
         "note" : delete_note
     }
     
-    command = input(f"What would you like to delete: {Colors.HEADER}{', '.join(delete_options)}{Colors.ENDC} ")
-    return delete_options[command](input(f"Enter the name of {command}: "))
+    command = input(f"What would you like to delete: {Colors.HEADER}{', '.join(delete_options)}{Colors.ENDC} ").lower()
+    return delete_options[command](input(f"Enter the name of {command}: ")).lower()
 
     
 @input_error
 def showall():
-    item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ")
+    item = input(f"{Colors.HEADER}Available options: contacts, notes{Colors.ENDC}\nWhat would you like to see?: ").lower()
     if not item or item not in ["contacts", "notes"]:
         return f"{Colors.FAIL}{Colors.UNDERLINE}Option not available {len(contacts)}.{Colors.ENDC}"
     elif item == "notes":
@@ -232,7 +232,7 @@ def main():
     load_books(filename)
 
     while True:
-        print(f"\n{Colors.HEADER}Available commands: hello, add, edit, change, delete, showall, congratulate, search, bye.{Colors.ENDC}")
+        print(f"\n{Colors.HEADER}Available commands: hello, add, edit, delete, showall, congratulate, search, bye.{Colors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}")
@@ -250,15 +250,14 @@ def main():
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
             continue
         else:
-            items = input(f"What would you like to {command}?: ").split(', ')
+            items = input(f"What would you like to {command}?: ").lower().split(', ')
             try:
                 [items_list[item] for item in items]
             except KeyError as e:
                 print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: can not {command} {e}.{Colors.ENDC}")
                 print(f"{Colors.HEADER}Available options are: {', '.join(items_list.keys())}.{Colors.ENDC}")
                 continue
-            name = input("Enter the name (or title): ")
-            
+            name = input("Enter the name (or title): ").lower()
             print(command_maps[command](items, name))
 
 
