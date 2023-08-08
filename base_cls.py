@@ -111,10 +111,9 @@ class Record:
         index = self.phones.index(old_phone)
         self.phones[index] = Phone(new_phone)
 
-    def delete_phone(self, phone):
-        for item in self.phones:
-            if item.value == "phone":
-                self.phones.remove(item)
+    def delete_phone(self, choice):
+        return f"Phone {self.phones.pop(choice)} was successfully deleted!"
+
 
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
@@ -206,8 +205,15 @@ class Notes(UserDict):
     def get_note(self, title: str):
         return self.data.get(title)
 
-    def delete_note(self, title: str):
-        return self.data.pop(title, None)
+    def delete_note(self, name: str):
+        try:
+            self.data.pop(name)
+            return(f"Note {name} was successfully deleted from the notes ")
+        except KeyError:
+            return f"There is no such note: {name} in the notes!"
+
+   # def delete_note(self, title: str):
+    #    return self.data.pop(title, None)
 
 
 class Contacts(UserDict):
@@ -221,7 +227,14 @@ class Contacts(UserDict):
         return self.data.get(name)
 
     def delete_record(self, name):      #Удаление записи
-        return self.data.pop(name, None)
+        try:
+            self.data.pop(name)
+            return(f"Contact {name} was successfully deleted from the book ")
+        except KeyError:
+            return f"There is no such contact: {name} in the book!"
+   
+    #def delete_record(self, name):      #Удаление записи
+     #   return self.data.pop(name, None)
 
     def iterator(self, num_records):        #Итератор(Принимает число, возвращает генератор)
         records = list(self.data.values())

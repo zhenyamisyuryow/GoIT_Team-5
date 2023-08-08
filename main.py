@@ -139,7 +139,34 @@ def search():
         elif choice.lower() == "note":
             break
         
-    return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
+@input_error       
+def delete_phone(name):
+    for i in range(len(contacts[name].phones)):
+                print(f"{i + 1}. {contacts[name].phones[i]}")
+    choice = int(input("Select the phone number to edit (enter the number): ")) - 1
+    return contacts[name].delete_phone(choice)
+    
+    
+def delete_contact(name):
+    return contacts.delete_record(name)
+    
+
+def delete_note(name):
+    return notes.delete_note(name)
+    
+    
+
+@input_error       
+def delete():
+    delete_options = {
+        "phone" : delete_phone,
+        "contact" : delete_contact,
+        "note" : delete_note
+    }
+    
+    command = input(f"What would you like to delete: {Colors.HEADER}{', '.join(delete_options)}{Colors.ENDC} ")
+    return delete_options[command](input(f"Enter the name of {command}: "))
+
     
 @input_error
 def showall():
@@ -173,6 +200,7 @@ command_maps = {
     "showall" : showall,
     "congratulate" : congratulate,
     "edit" : edit,
+    "delete" : delete
 }
 items_list = {
     "contact": True,
@@ -198,7 +226,7 @@ def main():
             continue
         command = user_input.split()[0]
 
-        if command in ["hello", "showall", "congratulate", "search"]:
+        if command in ["hello", "showall", "congratulate", "search", "delete"]:
             print(command_maps[command]())
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
