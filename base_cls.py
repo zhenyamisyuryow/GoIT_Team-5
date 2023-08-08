@@ -171,11 +171,8 @@ class Note():
         self.content = content
         self.tags = tags
 
-    def add_title(self, title: str):
-        self.title = title
-
     def add_content(self, content: str):
-        self.content = content
+        self.content += '\n'+content
 
     def add_tags(self, tags: list):
         if tags:
@@ -214,10 +211,10 @@ class Notes(UserDict):
     
     def search_note(self, query: str):
         notes_results = []        
-        for key, value in self.data.items():
-            if str(value).lower().find(query.lower()) != -1:
-                notes_results.append(value)
-        return notes_results
+        for note in self.data.values():
+            if query in str(vars(note)):
+                notes_results.append(str(note))
+        return '\n\n'.join(notes_results) if notes_results else f"{Colors.WARNING}{Colors.UNDERLINE}No notes were found.{Colors.ENDC}"
     
     def sort_by_tag(self):
         sorted_notes = sorted(self.data.values(), key=lambda note: note.tags[0] if note.tags else "")
@@ -256,17 +253,12 @@ class Contacts(UserDict):
         for i in range(0, len(records), num_records):
             yield records[i:i + num_records]
 
-    def search_contacts(self, query):           #Функционал поиска в контактной книге
-        contacts = []
+    def search_contacts(self, query):
+        result = []
         for record in self.data.values():
-            if query.lower() in str(record.name).lower():
-                contacts.append(str(record))
-            else:
-                for phone in record.phones:
-                    if query in phone.value:
-                        contacts.append(str(record))
-                        break
-        return '\n\n'.join(contacts)
+            if query and query in str(vars(record).values()):
+                result.append(str(record))
+        return '\n\n'.join(result) if result else f"{Colors.WARNING}{Colors.UNDERLINE}Nothing was found{Colors.ENDC}"
     
     def congratulate_period(self, number_days):
         start_period = datetime.now().date()
@@ -291,7 +283,7 @@ class Contacts(UserDict):
     def save_book(self, file):
         pickle.dump(self.data, file)   
     
-        
+
 class Colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
