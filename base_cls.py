@@ -212,8 +212,7 @@ class Notes(UserDict):
         except KeyError:
             return f"There is no such note: {name} in the notes!"
 
-   # def delete_note(self, title: str):
-    #    return self.data.pop(title, None)
+
 
 
 class Contacts(UserDict):
@@ -233,8 +232,6 @@ class Contacts(UserDict):
         except KeyError:
             return f"There is no such contact: {name} in the book!"
    
-    #def delete_record(self, name):      #Удаление записи
-     #   return self.data.pop(name, None)
 
     def iterator(self, num_records):        #Итератор(Принимает число, возвращает генератор)
         records = list(self.data.values())
