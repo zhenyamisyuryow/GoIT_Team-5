@@ -72,34 +72,55 @@ def add(items, name):
     return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been added.{Colors.ENDC}"
 
 
-# @input_error
+@input_error
 def edit(items, name):
-    if name not in contacts:
-        return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Contact doesn't exist.{Colors.ENDC}"
+    try:
+        record: Record = contacts[name]
+    except KeyError:
+        return f"{Colors.FAIL}{Colors.UNDERLINE}Error: contact {name} doesn't exist.{Colors.ENDC}"
 
-    record = contacts[name]
-    phone_list = record.phones
-    if "phone" in items and len(phone_list)>1:
-        try:
-            for i in range(len(phone_list)):
-                print(f"{i + 1}. {phone_list[i]}")
-            choice = int(input("Select the phone number to edit (enter the number): ")) - 1
-        except:
-            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a digit.{Colors.ENDC}"
-        if 0 <= choice < len(phone_list):
-            new_phone = input("Enter the new phone number: ")
-            record.edit_phone(phone_list[choice], new_phone)
-            return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! Phone number edited for {name}.{Colors.ENDC}"
-        else:
-            return "Invalid choice."
+    item_maps = {
+        "phone": record.add_phone,
+        "email": record.add_email,
+        "birthday": record.add_birthday,
+        "address": record.add_address,
+    }
+
     for item in items:
-        if item in record:
+        if item == "phone":
+            if len(record.phones) == 1:
+                new_phone = input("Enter the new phone number: ")
+                try:
+                    record.phones[0] = new_phone
+                except Exception as e:
+                    return f"{Colors.FAIL}{Colors.UNDERLINE}{e}{Colors.ENDC}"
+            elif len(record.phones) > 1:
+                print("Select a phone number to edit:")
+                for idx, phone in enumerate(record.phones):
+                    print(f"{idx + 1}. {phone}")
+                choice = input("Enter the number of the phone to edit: ")
+                try:
+                    choice_idx = int(choice) - 1
+                    if 0 <= choice_idx < len(record.phones):
+                        new_phone = input("Enter the new phone number: ")
+                        record.phones[choice_idx] = new_phone
+
+                    else:
+                        return "Error: Invalid choice."
+                except ValueError:
+                    return "Error: Invalid choice."
+            else:
+                return "Error: No phone numbers available to edit."
+        elif item in item_maps:
             new_value = input(f"Enter the new {item}: ")
-            record[item] = new_value
-        
+            try:
+                item_maps[item](new_value)
+
+            except Exception as e:
+                return f"{Colors.FAIL}{Colors.UNDERLINE}{e}{Colors.ENDC}"
         else:
-            return f"{Colors.FAIL}Error: Invalid item.{Colors.ENDC}"
-    return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been edited for {name}.{Colors.ENDC}"
+            return f"{Colors.FAIL}{Colors.UNDERLINE}Error: {item} cannot be edited.{Colors.ENDC}"
+    return f"{Colors.OKGREEN}{Colors.UNDERLINE}Success! {', '.join(items)} have been edited.{Colors.ENDC}"
 
 @input_error
 def congratulate():
@@ -170,7 +191,7 @@ def main():
     
 
     while True:
-        print(f"\n{Colors.HEADER}Available commands: hello, add, change, delete, showall, congratulate, search, bye.{Colors.ENDC}")
+        print(f"\n{Colors.HEADER}Available commands: hello, add, edit, change, delete, showall, congratulate, search, bye.{Colors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}")
