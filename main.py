@@ -36,6 +36,24 @@ def bye():
     save_book(filename)
     return "Good bye!"
 
+def help():
+    help_text = """
+    Available commands:
+    hello - type "hello" to display a greeting message
+    add - type "add" to add new item
+    edit - type "edit" to edit existing item
+    bye - type "bye" to save and exit the program
+    delete - type "delete" to delete items from contacts or notes
+    search - type "search" to search for contacts or notes
+    showall - type "showall" to display all contacts or notes
+    congratulate - type "congratulate" to display contacts with birthday in the entered period
+    clean folder - type "clean folder" to organize files in a folder
+
+    Available items:
+    phone - required format is: +380(XX)XXX-XX-XX
+    birthday - required format is: MM-DD-YYYY
+    """
+    return help_text
 
 @input_error
 def add(items, name):
@@ -58,6 +76,7 @@ def add(items, name):
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         elif item == "tags":
+            print(name)
             try:
                 tags = input("Add tags: ").lower().split(", ")
                 notes[name].add_tags(tags)
@@ -246,6 +265,7 @@ def clean():
 command_maps = {
     "hello" : hello,
     "bye" : bye,
+    "help" : help,
     "add" : add,
     "edit" : edit,
     "delete" : delete,
@@ -254,15 +274,29 @@ command_maps = {
     "congratulate" : congratulate,
     "clean folder": sort.organize_files
 }
-items_list = {
+items_list = {"add":{
     "contact": True,
     "phone": True, 
     "email": True, 
     "birthday": True, 
     "address": True, 
     "note": True,
-    "tags": True,
-}
+    "tags": True},
+"edit":{"contact": True,
+    "phone": True, 
+    "email": True, 
+    "birthday": True, 
+    "address": True, 
+    "note": True,
+    "tags": False},
+"delete": {"contact": True,
+    "phone": True, 
+    "email": True, 
+    "birthday": True, 
+    "address": True, 
+    "note": True,
+    "tags": False}}
+
 
     
 def main():
@@ -278,7 +312,7 @@ def main():
             continue
         command = user_input.split()[0]
 
-        if command in ["hello", "showall", "congratulate", "search"]:
+        if command in ["hello", "help", "showall", "congratulate", "search"]:
             print(command_maps[command]())
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
@@ -292,19 +326,26 @@ def main():
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
             continue
         else:
-            items = input(f"What would you like to {command}? :(available options:{Colors.HEADER} {', '.join(items_list)}{Colors.ENDC}) ").lower().split(', ')
+            items = input(f"What would you like to {command}? :(available options):{Colors.HEADER} {', '.join(list(filter(lambda x: items_list[command][x] == True, items_list[command])))}{Colors.ENDC} ").lower().split(', ')
             for item in items:
                 if item == "note":
-                    name = input("Enter note title: ").lower()
+                    name = input("Enter the note title: ").lower()
                     print(command_maps[command]([item], name))
                     items.remove(item)
             if len(items) < 1:
                 continue
-            if item in items_list:
+            
+            
+            if item == "tags" and item in list(filter(lambda x: items_list[command][x] == True, items_list[command])):
+                name = input(f"Enter the {Colors.HEADER}note title{Colors.ENDC} of the tags: ").lower()
+                print(command_maps[command](items, name))
+                
+            elif item in list(filter(lambda x: items_list[command][x] == True, items_list[command])):
                 name = input(f"Enter the {Colors.HEADER}name{Colors.ENDC} of the contact: ").lower()
                 print(command_maps[command](items, name))
 
-
+            else:
+                print(f"\nCommand{Colors.HEADER} {command}{Colors.ENDC} missing option {Colors.FAIL}{item}{Colors.ENDC}")
 
 if __name__ == "__main__":
     main()
