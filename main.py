@@ -6,6 +6,12 @@ import sort
 contacts = Contacts()
 notes = Notes()
 filename = "data.bin"
+format_maps = {
+                "phone": "+380(XX)XXX-XX-XX",
+                "email": "john.smith@example.org",
+                "birthday": "dd-mm-yyyy",
+                "address": "free",
+            }
 
 def input_error(func):
     def handler(*args):
@@ -36,7 +42,7 @@ def add(items, name):
     for item in items:
         if item == "contact":
             if name not in contacts:
-                phone = input("Enter the phone: ")
+                phone = input(f"Enter the phone number in the format: {Colors.HEADER}+380(XX)XXX-XX-XX:{Colors.ENDC} ")
                 try:
                     record = Record(name, phone)
                 except Exception as e:
@@ -68,7 +74,7 @@ def add(items, name):
                 "birthday": record.add_birthday,
                 "address": record.add_address,
             }
-            item_input = input(f"Enter the {item}: ").lower()
+            item_input = input(f"Enter the {item} in the format: {Colors.HEADER}{format_maps[item]}{Colors.ENDC} ").lower()
             try:
                 item_maps[item](item_input)
             except Exception as e:
@@ -102,7 +108,7 @@ def edit(items, name):
             }
             if item == "phone":
                 if len(record.phones) == 1:
-                    new_phone = input("Enter the new phone number: ")
+                    new_phone = input(f"Enter the new phone number in the format: {Colors.HEADER}+380(XX)XXX-XX-XX {Colors.ENDC} ")
                     try:
                         record.phones[0] = Phone(new_phone)
                     except Exception as e:
@@ -114,7 +120,7 @@ def edit(items, name):
                     try:
                         choice = int(input("Enter the number of the phone to edit: "))-1
                         if 0 <= choice < len(record.phones):
-                            new_phone = input("Enter the new phone number: ")
+                            new_phone = input(f"Enter the new phone number in the format: {Colors.HEADER}+380(XX)XXX-XX-XX {Colors.ENDC} ")
                             try:
                                 record.phones[choice] = Phone(new_phone)
                             except ValueError as e:
@@ -126,7 +132,7 @@ def edit(items, name):
                 else:
                     return f"{Colors.FAIL}{Colors.UNDERLINE}Error: No phone numbers available.{Colors.ENDC}"
             elif item in item_maps:
-                new_value = input(f"Enter the new {item}: ").lower()
+                new_value = input(f"Enter the new {item} in the format: {Colors.HEADER}{format_maps[item]} {Colors.ENDC} ").lower()
                 try:
                     item_maps[item](new_value)
                 except Exception as e:
@@ -280,13 +286,13 @@ def main():
             break
         elif user_input == "clean folder":
             folder = input("Enter the path of the folder to organize: ")
-            command_maps["clean folder"](folder)
+            print(command_maps["clean folder"](folder))
             continue
         elif command not in command_maps:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
             continue
         else:
-            items = input(f"What would you like to {command}?: ").lower().split(', ')
+            items = input(f"What would you like to {command}? :(available options:{Colors.HEADER} {', '.join(items_list)}{Colors.ENDC}) ").lower().split(', ')
             for item in items:
                 if item == "note":
                     name = input("Enter note title: ").lower()
@@ -294,8 +300,9 @@ def main():
                     items.remove(item)
             if len(items) < 1:
                 continue
-            name = input("Enter the name of the contact: ").lower()
-            print(command_maps[command](items, name))
+            if item in items_list:
+                name = input(f"Enter the {Colors.HEADER}name{Colors.ENDC} of the contact: ").lower()
+                print(command_maps[command](items, name))
 
 
 
