@@ -259,8 +259,19 @@ class Contacts(UserDict):
     def search_contacts(self, query):           #Функционал поиска в контактной книге
         result = []
         for record in self.data.values():
-            if query and query in str(vars(record).values()):
+            united_str = ""
+            for rec in record:
+                try:
+                    united_str = united_str + str(rec.value)
+                except AttributeError:
+                    pass
+            united_str = re.sub(r"\+|\-|\)|\(", "", united_str)
+            if query and query in united_str:
                 result.append(str(record))
+        '''
+        for record in self.data.values():
+            if query and query in str(vars(record).values()):
+                result.append(str(record))'''
         return '\n\n'.join(result) if result else f"{Colors.WARNING}{Colors.UNDERLINE}Nothing was found{Colors.ENDC}"
     
     def congratulate_period(self, number_days):

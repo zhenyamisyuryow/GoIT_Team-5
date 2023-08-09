@@ -126,7 +126,7 @@ def edit(items, name):
                 else:
                     return f"{Colors.FAIL}{Colors.UNDERLINE}Error: No phone numbers available.{Colors.ENDC}"
             elif item in item_maps:
-                new_value = input(f"Enter the new {item}: ")
+                new_value = input(f"Enter the new {item}: ").lower()
                 try:
                     item_maps[item](new_value)
                 except Exception as e:
@@ -149,12 +149,12 @@ def search():
         choice = input(f"What would you like to search {Colors.HEADER}contact{Colors.ENDC} or {Colors.HEADER}note{Colors.ENDC}?: ").lower()
         if choice == "contact":
             try:
-                return '\n' + contacts.search_contacts(input(f"Enter the query for search: "))
+                return '\n' + contacts.search_contacts(input(f"Enter the query for search: ").lower())
             except:
                 print(f"{Colors.WARNING}{Colors.UNDERLINE}Provide query for the search!{Colors.ENDC}")
                 continue
         elif choice == "note":
-            return notes.search_note(input("Enter the query for search: "))
+            return notes.search_note(input("Enter the query for search: ").lower())
         else:
             return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Choose between available options: contact, note{Colors.ENDC}"     
     
@@ -294,7 +294,7 @@ def main():
                     items.remove(item)
             if len(items) < 1:
                 continue
-            name = input("Enter the name of the contact: ")
+            name = input("Enter the name of the contact: ").lower()
             print(command_maps[command](items, name))
 
 
