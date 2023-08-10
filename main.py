@@ -58,6 +58,7 @@ def help():
     return help_text
 
 
+
 @input_error
 def add(items, name):
     for item in items:
@@ -79,6 +80,10 @@ def add(items, name):
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         elif item == "tags":
+
+
+
+
             try:
                 notes[name].add_tags(input("Add tags: ").lower().split(", "))
             except:
