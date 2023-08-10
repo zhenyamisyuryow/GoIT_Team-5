@@ -53,7 +53,6 @@ def help():
     Available items:
     phone - required format is: +380(XX)XXX-XX-XX
     birthday - required format is: MM-DD-YYYY
-    email - required format is: john.smith@example.org
     """
     return help_text
 
@@ -109,10 +108,10 @@ def edit(items, name):
         if item == "note":
             try:
                 notes[name]
-              #  title = input("Enter new title (Press Enter to skip): ").lower()
+                title = input("Enter new title (Press Enter to skip): ").lower()
                 content = input("Enter new content (Press Enter to skip): ").lower()
                 tags = input("Enter new tags (Press Enter to skip): ").lower().split(", ")
-                notes.edit_note(name, content=content, tags=tags)
+                notes.edit_note(name,title = title, content=content, tags=tags)
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: note with such name doesn't exist.{Colors.ENDC}"
         else:
@@ -288,7 +287,7 @@ items_list = {"add":{
     "address": True, 
     "note": True,
     "tags": True},
-"edit":{"contact": True,
+"edit":{"contact": False,
     "phone": True, 
     "email": True, 
     "birthday": True, 
