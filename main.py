@@ -36,24 +36,6 @@ def bye():
     save_book(filename)
     return "Good bye!"
 
-def help():
-    help_text = """
-    Available commands:
-    hello - type "hello" to display a greeting message
-    add - type "add" to add new item
-    edit - type "edit" to edit existing item
-    bye - type "bye" to save and exit the program
-    delete - type "delete" to delete items from contacts or notes
-    search - type "search" to search for contacts or notes
-    showall - type "showall" to display all contacts or notes
-    congratulate - type "congratulate" to display contacts with birthday in the entered period
-    clean folder - type "clean folder" to organize files in a folder
-
-    Available items:
-    phone - required format is: +380(XX)XXX-XX-XX
-    birthday - required format is: MM-DD-YYYY
-    """
-    return help_text
 
 def help():
     help_text = """
@@ -71,6 +53,7 @@ def help():
     Available items:
     phone - required format is: +380(XX)XXX-XX-XX
     birthday - required format is: MM-DD-YYYY
+    email - required format is: john.smith@example.org
     """
     return help_text
 
@@ -96,10 +79,8 @@ def add(items, name):
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         elif item == "tags":
-            print(name)
             try:
-                tags = input("Add tags: ").lower().split(", ")
-                notes[name].add_tags(tags)
+                notes[name].add_tags(input("Add tags: ").lower().split(", "))
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         else:
@@ -127,10 +108,11 @@ def edit(items, name):
     for item in items:
         if item == "note":
             try:
-                title = input("Enter new title (Press Enter to skip): ").lower()
+                notes[name]
+              #  title = input("Enter new title (Press Enter to skip): ").lower()
                 content = input("Enter new content (Press Enter to skip): ").lower()
-                tags = input("Enter new tags (Press Enter to skip): ").lower()
-                notes.edit_note(name, title = title, content=content, tags=tags)
+                tags = input("Enter new tags (Press Enter to skip): ").lower().split(", ")
+                notes.edit_note(name, content=content, tags=tags)
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: note with such name doesn't exist.{Colors.ENDC}"
         else:
@@ -353,7 +335,7 @@ def main():
             items = input(f"What would you like to {command}? :(available options):{Colors.HEADER} {', '.join(list(filter(lambda x: items_list[command][x] == True, items_list[command])))}{Colors.ENDC} ").lower().split(', ')
             for item in items:
                 if item == "note":
-                    name = input("Enter the note title: ").lower()
+                    name = input(f"Enter the {Colors.HEADER}note title{Colors.ENDC}: ").lower()
                     print(command_maps[command]([item], name))
                     items.remove(item)
             if len(items) < 1:

@@ -215,7 +215,7 @@ class Notes(UserDict):
     def search_note(self, query: str):
         notes_results = []        
         for note in self.data.values():
-            if query in str(vars(note)):
+            if query in str(vars(note).values()):
                 notes_results.append(str(note))
         return '\n\n'.join(notes_results) if notes_results else f"{Colors.WARNING}{Colors.UNDERLINE}No notes were found.{Colors.ENDC}"
     
