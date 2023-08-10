@@ -19,7 +19,7 @@ def organize_files(folder):
     
     file_types = {
         'Images': ['.jpg', '.jpeg', '.png', '.gif'],
-        'Documents': ['.pdf', '.doc', '.docx', '.txt'],
+        'Documents': ['.pdf', '.doc', '.docx', '.txt', '.xlsx', 'xls'],
         'Videos': ['.mp4', '.avi', '.mov'],
         'Music': ['.mp3', '.wav', '.flac'],
     }
