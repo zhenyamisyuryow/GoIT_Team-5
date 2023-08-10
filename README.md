@@ -24,11 +24,20 @@ This project implements a virtual assistant in Python, allowing users to manage 
 - Display contacts or notes in a paginated manner.
 - Display contacts whose birthdays are in the next requested days.
 
+## Installation
+
+1. Clone the repository: `git clone https://github.com/zhenyamisyuryow/Py_Wiazrds_Virtual_assistant.git`
+2. Navigate to the project directory: `cd virtual-assistant`
+3. Install package: `pip install .`
+
 ## Usage
 
-1. Clone the repository: `git clone https://github.com/yourusername/virtual-assistant.git`
-2. Navigate to the project directory: `cd virtual-assistant`
-3. Run the main script: `python main.py`
+1. Run 'virtual_assistant' command in a terminal from anywhere on your computer.
+2. Type in help to get a list of all available commands, operatable items and their descriptions.
+3. Type in the command.
+4. Type in the item/items you want to operate with (you can type in multiple items at once).
+5. Proceed with the instructions.
+6. Type bye, good bye, close or exit to save existing data and terminate the program.
 
 ## Commands
 
@@ -41,13 +50,7 @@ The virtual assistant supports the following commands:
 - `search`: Search for contacts or notes.
 - `showall`: Display all contacts or notes.
 - `congratulate`: Display contacts with upcoming birthdays.
-- `organize`: Organize files in a specified folder.
-
-## Installation
-
-1. Clone the repository: `git clone https://github.com/zhenyamisyuryow/Py_Wiazrds_Virtual_assistant.git`
-2. Navigate to the project directory: `cd virtual-assistant`
-3. Install package: `pip install .`
+- `organize`: Organize files by corresponding folders in a specified directory.
 
 ## Contributors
 
