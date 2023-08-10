@@ -36,6 +36,7 @@ def bye():
     save_book(filename)
     return "Good bye!"
 
+
 def help():
     help_text = """
     Available commands:
@@ -52,6 +53,7 @@ def help():
     Available items:
     phone - required format is: +380(XX)XXX-XX-XX
     birthday - required format is: MM-DD-YYYY
+    email - required format is: john.smith@example.org
     """
     return help_text
 
@@ -103,8 +105,7 @@ def add(items, name):
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         elif item == "tags":
             try:
-                tags = input("Add tags: ").lower().split(", ")
-                notes[name].add_tags(tags)
+                notes[name].add_tags(input("Add tags: ").lower().split(", "))
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         else:
@@ -132,10 +133,11 @@ def edit(items, name):
     for item in items:
         if item == "note":
             try:
-                title = input("Enter new title (Press Enter to skip): ").lower()
+                notes[name]
+              #  title = input("Enter new title (Press Enter to skip): ").lower()
                 content = input("Enter new content (Press Enter to skip): ").lower()
-                tags = input("Enter new tags (Press Enter to skip): ").lower()
-                notes.edit_note(name, title = title, content=content, tags=tags)
+                tags = input("Enter new tags (Press Enter to skip): ").lower().split(", ")
+                notes.edit_note(name, content=content, tags=tags)
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: note with such name doesn't exist.{Colors.ENDC}"
         else:
@@ -365,7 +367,7 @@ def main():
             items = input(f"What would you like to {command}?: ").lower().split(', ')
             for item in items:
                 if item == "note":
-                    name = input("Enter the note title: ").lower()
+                    name = input(f"Enter the {Colors.HEADER}note title{Colors.ENDC}: ").lower()
                     print(command_maps[command]([item], name))
                     items.remove(item)
             if len(items) < 1:
