@@ -36,6 +36,26 @@ def bye():
     save_book(filename)
     return "Good bye!"
 
+def help():
+    help_text = """
+    Available commands:
+    hello - type "hello" to display a greeting message
+    add - type "add" to add new item
+    edit - type "edit" to edit existing item
+    bye - type "bye" to save and exit the program
+    delete - type "delete" to delete items from contacts or notes
+    search - type "search" to search for contacts or notes
+    showall - type "showall" to display all contacts or notes
+    congratulate - type "congratulate" to display contacts with birthday in the entered period
+    clean folder - type "clean folder" to organize files in a folder
+
+    Available items:
+    phone - required format is: +380(XX)XXX-XX-XX
+    birthday - required format is: MM-DD-YYYY
+    """
+    return help_text
+
+
 
 def help():
     help_text = """
@@ -82,7 +102,6 @@ def add(items, name):
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         elif item == "tags":
-            print(name)
             try:
                 tags = input("Add tags: ").lower().split(", ")
                 notes[name].add_tags(tags)
