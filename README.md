@@ -26,7 +26,7 @@ This project implements a virtual assistant in Python, allowing users to manage 
 
 ## Installation
 
-1. Clone the repository: `git clone https://github.com/zhenyamisyuryow/Py_Wiazrds_Virtual_assistant.git`
+1. Clone the repository: `git clone https://github.com/zhenyamisyuryow/PyWizards_virtual_assistant.git`
 2. Navigate to the project directory: `cd virtual-assistant`
 3. Install package: `pip install .`
 
