@@ -36,29 +36,6 @@ def bye():
     save_book(filename)
     return "Good bye!"
 
-
-def help():
-    help_text = """
-    Available commands:
-    hello - type "hello" to display a greeting message
-    add - type "add" to add new item
-    edit - type "edit" to edit existing item
-    bye - type "bye" to save and exit the program
-    delete - type "delete" to delete items from contacts or notes
-    search - type "search" to search for contacts or notes
-    showall - type "showall" to display all contacts or notes
-    congratulate - type "congratulate" to display contacts with birthday in the entered period
-    clean folder - type "clean folder" to organize files in a folder
-
-    Available items:
-    phone - required format is: +380(XX)XXX-XX-XX
-    birthday - required format is: MM-DD-YYYY
-    email - required format is: john.smith@example.org
-    """
-    return help_text
-
-
-
 def help():
     help_text = """
     Available commands:
@@ -134,10 +111,10 @@ def edit(items, name):
         if item == "note":
             try:
                 notes[name]
-              #  title = input("Enter new title (Press Enter to skip): ").lower()
+                title = input("Enter new title (Press Enter to skip): ").lower()
                 content = input("Enter new content (Press Enter to skip): ").lower()
                 tags = input("Enter new tags (Press Enter to skip): ").lower().split(", ")
-                notes.edit_note(name, content=content, tags=tags)
+                notes.edit_note(name,title = title, content=content, tags=tags)
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: note with such name doesn't exist.{Colors.ENDC}"
         else:
