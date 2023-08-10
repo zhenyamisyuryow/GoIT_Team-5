@@ -165,11 +165,11 @@ class Record:
             raise StopIteration
 
     def __repr__(self):             #Вывести все поля для класса Record в строку
-        return (f"Name: {self.name},"
-                f"\nPhones:\n{(','+str(chr(10))).join('Phone '+str(i+1)+': '+str(phone) for i, phone in enumerate(self.phones))},\n"
-                f"Email: {self.email},"
-                f"\nBirthday: {self.birthday},"
-                f"\nAddress: {self.address}")
+        return (f"Name: {self.name},\n"
+                f"{(','+str(chr(10))).join('Phone '+str(i+1)+': '+str(phone) for i, phone in enumerate(self.phones))},\n"
+                f"Email: {self.email},\n"
+                f"Birthday: {self.birthday},\n"
+                f"Address: {self.address}")
 
 
 
