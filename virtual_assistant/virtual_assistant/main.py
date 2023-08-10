@@ -1,6 +1,6 @@
-from base_cls import *
+from .base_cls import *
 import os
-import sort
+from . import sort
 
 
 contacts = Contacts()
