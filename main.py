@@ -57,12 +57,36 @@ def help():
 
 
 
+def help():
+    help_text = """
+    Available commands:
+    hello - type "hello" to display a greeting message
+    add - type "add" to add new item
+    edit - type "edit" to edit existing item
+    bye - type "bye" to save and exit the program
+    delete - type "delete" to delete items from contacts or notes
+    search - type "search" to search for contacts or notes
+    showall - type "showall" to display all contacts or notes
+    congratulate - type "congratulate" to display contacts with birthday in the entered period
+    clean folder - type "clean folder" to organize files in a folder
+
+    Available items:
+    phone - required format is: +380(XX)XXX-XX-XX
+    birthday - required format is: MM-DD-YYYY
+    email - any email format
+    address - arbitrary
+    note - arbitrary
+    tags - arbitrary
+    """
+    return help_text
+
+
 @input_error
 def add(items, name):
     for item in items:
         if item == "contact":
             if name not in contacts:
-                phone = input(f"Enter the phone number in the format: {Colors.HEADER}+380(XX)XXX-XX-XX:{Colors.ENDC} ")
+                phone = input(f"Enter the phone in following format {Colors.HEADER}+380(XX)XXX-XX-XX:{Colors.ENDC}: ")
                 try:
                     record = Record(name, phone)
                 except Exception as e:
@@ -78,7 +102,6 @@ def add(items, name):
             except:
                 return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide tags{Colors.ENDC}"
         elif item == "tags":
-
             try:
                 tags = input("Add tags: ").lower().split(", ")
                 notes[name].add_tags(tags)
@@ -95,7 +118,7 @@ def add(items, name):
                 "birthday": record.add_birthday,
                 "address": record.add_address,
             }
-            item_input = input(f"Enter the {item} in the format: {Colors.HEADER}{format_maps[item]}{Colors.ENDC} ").lower()
+            item_input = input(f"Enter the {item} in following format {Colors.HEADER}{format_maps[item]}{Colors.ENDC}: ").lower()
             try:
                 item_maps[item](item_input)
             except Exception as e:
@@ -129,7 +152,7 @@ def edit(items, name):
             }
             if item == "phone":
                 if len(record.phones) == 1:
-                    new_phone = input(f"Enter the new phone number in the format: {Colors.HEADER}+380(XX)XXX-XX-XX {Colors.ENDC} ")
+                    new_phone = input(f"Enter new phone number in following format {Colors.HEADER}+380(XX)XXX-XX-XX {Colors.ENDC}: ")
                     try:
                         record.phones[0] = Phone(new_phone)
                     except Exception as e:
@@ -141,7 +164,7 @@ def edit(items, name):
                     try:
                         choice = int(input("Enter the number of the phone to edit: "))-1
                         if 0 <= choice < len(record.phones):
-                            new_phone = input(f"Enter the new phone number in the format: {Colors.HEADER}+380(XX)XXX-XX-XX {Colors.ENDC} ")
+                            new_phone = input(f"Enter new phone number in following format {Colors.HEADER}+380(XX)XXX-XX-XX {Colors.ENDC} ")
                             try:
                                 record.phones[choice] = Phone(new_phone)
                             except ValueError as e:
@@ -166,7 +189,7 @@ def edit(items, name):
 def congratulate():
     while True:
         try:
-            return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations:> ")))
+            return contacts.congratulate_period(int(input(f"Enter the number of days for congratulations: ")))
         except:
             pass
 
@@ -212,7 +235,7 @@ def delete(items, name):
                         for idx, phone in enumerate(record.phones):
                             print(f"{idx + 1}. {phone}")
                         try:
-                            choice = int(input("Enter the number of the phone to delete: ")) -1
+                            choice = int(input("Choose the number of the phone to delete: ")) -1
                             del record.phones[choice]
                         except ValueError:
                             return f"{Colors.FAIL}{Colors.UNDERLINE}Error: Invalid choice.{Colors.ENDC}"
@@ -267,11 +290,7 @@ def clean():
 command_maps = {
     "hello" : hello,
     "bye" : bye,
-
-
-
     "help": help,
-
     "add" : add,
     "edit" : edit,
     "delete" : delete,
@@ -280,28 +299,38 @@ command_maps = {
     "congratulate" : congratulate,
     "clean folder": sort.organize_files
 }
-items_list = {"add":{
-    "contact": True,
-    "phone": True, 
-    "email": True, 
-    "birthday": True, 
-    "address": True, 
-    "note": True,
-    "tags": True},
-"edit":{"contact": True,
-    "phone": True, 
-    "email": True, 
-    "birthday": True, 
-    "address": True, 
-    "note": True,
-    "tags": False},
-"delete": {"contact": True,
-    "phone": True, 
-    "email": True, 
-    "birthday": True, 
-    "address": True, 
-    "note": True,
-    "tags": False}}
+items_list = {
+    "add":
+        {
+            "contact": True, 
+            "phone": True, 
+            "email": True, 
+            "birthday": True, 
+            "address": True, 
+            "note": True,
+            "tags": True
+        },
+    "edit":
+        {
+            "contact": True, 
+            "phone": True,  
+            "email": True,  
+            "birthday": True,  
+            "address": True,  
+            "note": True, 
+            "tags": False
+        },
+    "delete": 
+        {
+            "contact": True, 
+            "phone": True,  
+            "email": True,  
+            "birthday": True,  
+            "address": True,  
+            "note": True, 
+            "tags": False
+        }
+    }
 
 
     
@@ -311,7 +340,7 @@ def main():
     load_books(filename)
 
     while True:
-        print(f"\n{Colors.HEADER}Available commands: {', '.join(command_maps.keys())}.{Colors.ENDC}")
+        print(f"\n{Colors.HEADER}Available commands: {Colors.UNDERLINE}{', '.join(command_maps.keys())}.{Colors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}")
@@ -332,7 +361,8 @@ def main():
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
             continue
         else:
-            items = input(f"What would you like to {command}? :(available options):{Colors.HEADER} {', '.join(list(filter(lambda x: items_list[command][x] == True, items_list[command])))}{Colors.ENDC} ").lower().split(', ')
+            print(f"{Colors.HEADER}Available options: {Colors.UNDERLINE}{', '.join(list(filter(lambda x: items_list[command][x] == True, items_list[command])))}{Colors.ENDC}")
+            items = input(f"What would you like to {command}?: ").lower().split(', ')
             for item in items:
                 if item == "note":
                     name = input("Enter the note title: ").lower()
@@ -343,15 +373,15 @@ def main():
             
             
             if item == "tags" and item in list(filter(lambda x: items_list[command][x] == True, items_list[command])):
-                name = input(f"Enter the {Colors.HEADER}note title{Colors.ENDC} of the tags: ").lower()
+                name = input(f"Enter the note title of the tags: ").lower()
                 print(command_maps[command](items, name))
                 
             elif item in list(filter(lambda x: items_list[command][x] == True, items_list[command])):
-                name = input(f"Enter the {Colors.HEADER}name{Colors.ENDC} of the contact: ").lower()
+                name = input(f"Enter the name of the contact: ").lower()
                 print(command_maps[command](items, name))
 
             else:
-                print(f"\nCommand{Colors.HEADER} {command}{Colors.ENDC} missing option {Colors.FAIL}{item}{Colors.ENDC}")
+                print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: choose from available options.{Colors.ENDC}")
 
 if __name__ == "__main__":
     main()
