@@ -291,7 +291,7 @@ items_list = {
         },
     "edit":
         {
-            "contact": True, 
+            "contact": False, 
             "phone": True,  
             "email": True,  
             "birthday": True,  
