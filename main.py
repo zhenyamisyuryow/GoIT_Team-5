@@ -8,7 +8,7 @@ notes = Notes()
 filename = "data.bin"
 format_maps = {
                 "phone": "+380(XX)XXX-XX-XX",
-                "email": "john.smith@example.org",
+                "email": "any email format",
                 "birthday": "dd-mm-yyyy",
                 "address": "free",
             }
@@ -47,7 +47,7 @@ def help():
     search - type "search" to search for contacts or notes
     showall - type "showall" to display all contacts or notes
     congratulate - type "congratulate" to display contacts with birthday in the entered period
-    clean folder - type "clean folder" to organize files in a folder
+    organize - type "organize" to organize files in a folder
 
     Available items:
     phone - required format is: +380(XX)XXX-XX-XX
@@ -276,7 +276,7 @@ command_maps = {
     "search" : search,
     "showall" : showall,
     "congratulate" : congratulate,
-    "clean folder": sort.organize_files
+    "organize": sort.organize_files
 }
 items_list = {
     "add":
@@ -332,9 +332,9 @@ def main():
         elif command in ["bye", "good bye", "exit", "close"]:
             print(command_maps["bye"]())
             break
-        elif user_input == "clean folder":
+        elif user_input == "organize":
             folder = input("Enter the path of the folder to organize: ")
-            print(command_maps["clean folder"](folder))
+            print(command_maps["organize"](folder))
             continue
         elif command not in command_maps:
             print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
