@@ -1,6 +1,7 @@
-from base_cls import *
+from .base_cls import *
 import os
-import sort
+from . import sort
+from .command_handler import CommandsHandler, TerminalMessage
 
 
 contacts = Contacts()
@@ -291,7 +292,7 @@ items_list = {
         },
     "edit":
         {
-            "contact": False, 
+            "contact": True, 
             "phone": True,  
             "email": True,  
             "birthday": True,  
@@ -314,38 +315,51 @@ items_list = {
 
     
 def main():
-    print("Welcome to Virtual Assistant!")
+    terminal_message = TerminalMessage()
+    terminal_handler = CommandsHandler(terminal_message)
+    terminal_handler.send_message("Welcome to Virtual Assistant!")
     
     load_books(filename)
 
     while True:
-        print(f"\n{Colors.HEADER}Available commands: {Colors.UNDERLINE}{', '.join(command_maps.keys())}.{Colors.ENDC}")
+        output = ''
+        if not output:
+            pass
+        else:
+            terminal_handler.send_message(output)
+        terminal_handler.send_message(f"\n{Colors.HEADER}Available commands: {Colors.UNDERLINE}{', '.join(command_maps.keys())}.{Colors.ENDC}")
         user_input = input("Enter the command: ").lower()
         if not user_input:
-            print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}")
+            output = f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide a command.{Colors.ENDC}"
             continue
         command = user_input.split()[0]
 
         if command in ["hello", "help", "showall", "congratulate", "search"]:
-            print(command_maps[command]())
+            output = command_maps[command]()
+            terminal_handler.send_message(output)
             continue
         elif command in ["bye", "good bye", "exit", "close"]:
-            print(command_maps["bye"]())
+            output = command_maps["bye"]()
+            terminal_handler.send_message(output)
             break
         elif user_input == "organize":
             folder = input("Enter the path of the folder to organize: ")
-            print(command_maps["organize"](folder))
+            output = command_maps["organize"](folder)
+            terminal_handler.send_message(output)
             continue
         elif command not in command_maps:
-            print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}")
+            output = f"{Colors.FAIL}{Colors.UNDERLINE}Error: Provide valid command.{Colors.ENDC}"
+            terminal_handler.send_message(output)
             continue
         else:
-            print(f"{Colors.HEADER}Available options: {Colors.UNDERLINE}{', '.join(list(filter(lambda x: items_list[command][x] == True, items_list[command])))}{Colors.ENDC}")
+            output = f"{Colors.HEADER}Available options: {Colors.UNDERLINE}{', '.join(list(filter(lambda x: items_list[command][x] == True, items_list[command])))}{Colors.ENDC}"
+            terminal_handler.send_message(output)
             items = input(f"What would you like to {command}?: ").lower().split(', ')
             for item in items:
                 if item == "note":
                     name = input(f"Enter the {Colors.HEADER}note title{Colors.ENDC}: ").lower()
-                    print(command_maps[command]([item], name))
+                    output = command_maps[command]([item], name)
+                    terminal_handler.send_message(output)
                     items.remove(item)
             if len(items) < 1:
                 continue
@@ -353,14 +367,17 @@ def main():
             
             if item == "tags" and item in list(filter(lambda x: items_list[command][x] == True, items_list[command])):
                 name = input(f"Enter the note title of the tags: ").lower()
-                print(command_maps[command](items, name))
+                output = command_maps[command](items, name)
+                terminal_handler.send_message(output)
                 
             elif item in list(filter(lambda x: items_list[command][x] == True, items_list[command])):
                 name = input(f"Enter the name of the contact: ").lower()
-                print(command_maps[command](items, name))
+                output = command_maps[command](items, name)
+                terminal_handler.send_message(output)
 
             else:
-                print(f"{Colors.FAIL}{Colors.UNDERLINE}Error: choose from available options.{Colors.ENDC}")
+                output = f"{Colors.FAIL}{Colors.UNDERLINE}Error: choose from available options.{Colors.ENDC}"
+                terminal_handler.send_message(output)
 
 if __name__ == "__main__":
     main()
